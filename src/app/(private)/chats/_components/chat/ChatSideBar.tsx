@@ -3,7 +3,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Chat, ChatRoom, Message } from '@/types/chat';
 import { Search } from 'lucide-react'
 import Image from 'next/image'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 type Props = {
     chats: ChatRoom[];
@@ -17,17 +17,17 @@ const ChatSideBar = ({ chats, onSelect, activeId }: Props) => {
     const { user } = useAuth()
 
     // Helper function to get the other user (not the current user)
-    const getOtherUser = (chat: ChatRoom) => {
-        return chat.members.find(member => member._id !== user?._id) ?? chat.members[0];
-    };
 
+    const getOtherUser = useCallback((chat: ChatRoom) => {
+        return chat.members.find(member => member._id !== user?._id) ?? chat.members[0];
+    }, [user?._id]);
     // Helper function to get the other user's name
-    const getOtherUserName = (chat: ChatRoom) => {
+    const getOtherUserName = useCallback((chat: ChatRoom) => {
         const otherUser = getOtherUser(chat);
         return otherUser
             ? `${otherUser.first_name} ${otherUser.last_name}`
             : 'Unknown User';
-    };
+    }, [getOtherUser]);
 
     // Helper function to get the other user's profile image
     const getOtherUserImage = (chat: ChatRoom) => {
@@ -59,7 +59,7 @@ const ChatSideBar = ({ chats, onSelect, activeId }: Props) => {
         }, 300); // debounce
 
         return () => clearTimeout(timer);
-    }, [search, chats, user?._id]); // Add user._id to dependencies
+    }, [search, chats, user?._id, getOtherUserName]); // Add user._id to dependencies
 
     return (
         <div className="w-80 flex flex-col h-full bg-white border-r">

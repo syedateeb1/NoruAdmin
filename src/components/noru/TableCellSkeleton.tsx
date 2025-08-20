@@ -1,4 +1,5 @@
 import { Star } from "lucide-react";
+import OptimizedImage from "../OtimizedImage";
 
 
 export const TableCellSkeleton = ({ image, name, heading }: { image?: string, name: string, heading?: string }) => {
@@ -44,7 +45,15 @@ export const TableCellSkeleton = ({ image, name, heading }: { image?: string, na
     }
     return (
         <div className="flex gap-2 items-center  overflow-hidden max-w-full">
-            {image && <img src={image} className="w-10 h-10 rounded-full object-cover" />}
+            {image && (
+                <OptimizedImage
+                    src={image}
+                    alt="Avatar"
+                    width={40}   // w-10 = 2.5rem = 40px
+                    height={40}  // h-10 = 2.5rem = 40px
+                    className="w-10 h-10 rounded-full object-cover"
+                />
+            )}
             <div className="flex flex-col py-2 overflow-hidden">
                 <h5 className="font-sans text-heading-7 font-bold text-dark-4 break-words whitespace-normal">{heading}</h5>
                 <p className="font-sans text-body-lg font-medium text-dark break-words whitespace-normal">{name}</p>

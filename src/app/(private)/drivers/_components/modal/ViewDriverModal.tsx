@@ -1,7 +1,9 @@
 "use client";
 
+import OptimizedImage from "@/components/OtimizedImage";
 import { StatusBadge } from "@/components/StatusBadge";
 import { approveDriver } from "@/services/customerService";
+import Image from "next/image";
 import React from "react";
 
 interface ViewDriverModalProps {
@@ -51,11 +53,14 @@ export const ViewDriverModal: React.FC<ViewDriverModalProps> = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-3">
                         <div className="flex items-center gap-4">
-                            <img
+
+
+                            <OptimizedImage
                                 src={getFullUrl(driver?.image)}
                                 alt="Driver"
-                                className="w-24 h-24 rounded-full border object-cover shadow"
-                                onError={(e) => (e.currentTarget.src = "/fallback.png")}
+                                width={96} // w-24 = 6rem = 96px
+                                height={96} // h-24 = 6rem = 96px
+                                className="rounded-full  h-24 w-24    border object-cover shadow"
                             />
                             <div>
                                 <h3 className="text-xl font-semibold text-gray-800">
@@ -97,12 +102,15 @@ export const ViewDriverModal: React.FC<ViewDriverModalProps> = ({
                         <h4 className="text-lg font-semibold text-gray-800 mb-2">Driving License Images</h4>
                         <div className="flex flex-wrap gap-3">
                             {driver.driver_info.driving_licence_media.map((img: string, i: number) => (
-                                <img
+
+
+                                <OptimizedImage
                                     key={i}
                                     src={getFullUrl(img)}
                                     alt={`License ${i + 1}`}
-                                    className="w-40 h-28 object-cover rounded-lg shadow border"
-                                    onError={(e) => (e.currentTarget.src = "/fallback.png")}
+                                    width={160} // w-40 = 10rem = 160px
+                                    height={112} // h-28 = 7rem = 112px
+                                    className="rounded-full  w-40 h-28   border object-cover shadow"
                                 />
                             ))}
                         </div>
@@ -114,13 +122,17 @@ export const ViewDriverModal: React.FC<ViewDriverModalProps> = ({
                     <div className="mb-6">
                         <h4 className="text-lg font-semibold text-gray-800 mb-2">Driver ID Images</h4>
                         <div className="flex flex-wrap gap-3">
-                            {driver.driver_info.driver_id_media.map((img: string, i: number) => (
-                                <img
-                                    key={i}
+                            {driver.driver_info.driver_id_media.map((img: string, index: number) => (
+
+
+
+                                <OptimizedImage
+                                    key={index}
                                     src={getFullUrl(img)}
-                                    alt={`ID ${i + 1}`}
-                                    className="w-40 h-28 object-cover rounded-lg shadow border"
-                                    onError={(e) => (e.currentTarget.src = "/fallback.png")}
+                                    alt={`ID ${index + 1}`}
+                                    width={160}  // Tailwind w-40 = 10rem = 160px
+                                    height={112} // Tailwind h-28 = 7rem = 112px
+                                    className="rounded-full w-40  h-28 border object-cover shadow"
                                 />
                             ))}
                         </div>
@@ -152,12 +164,13 @@ export const ViewDriverModal: React.FC<ViewDriverModalProps> = ({
                         <h4 className="text-lg font-semibold text-gray-800 mb-2">Vehicle Images</h4>
                         <div className="flex flex-wrap gap-3">
                             {driver.driver_vehicle.vehicle_media.map((img: string, i: number) => (
-                                <img
+                                <OptimizedImage
                                     key={i}
                                     src={getFullUrl(img)}
                                     alt={`Vehicle ${i + 1}`}
-                                    className="w-40 h-28 object-cover rounded-lg shadow border"
-                                    onError={(e) => (e.currentTarget.src = "/fallback.png")}
+                                    width={160}   // w-40 = 10rem
+                                    height={112}  // h-28 = 7rem
+                                    className="object-cover rounded-lg shadow border"
                                 />
                             ))}
                         </div>
@@ -168,11 +181,12 @@ export const ViewDriverModal: React.FC<ViewDriverModalProps> = ({
                 {driver?.driver_vehicle?.registration_doc_url && (
                     <div className="mb-4">
                         <h4 className="text-lg font-semibold text-gray-800 mb-2">Registration Document</h4>
-                        <img
+                        <OptimizedImage
                             src={getFullUrl(driver.driver_vehicle.registration_doc_url)}
                             alt="Registration Document"
-                            className="w-72 object-contain border rounded-lg shadow"
-                            onError={(e) => (e.currentTarget.src = "/fallback.png")}
+                            width={288}   // Tailwind w-72 = 18rem = 288px
+                            height={200}  // adjust height as needed for object-contain
+                            className="object-contain border rounded-lg shadow"
                         />
                     </div>
                 )}

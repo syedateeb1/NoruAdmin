@@ -1,11 +1,20 @@
-/** @type {import("next").NextConfig} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack(config) {
+    // Remove existing SVG handling
+    config.module.rules = config.module.rules.map((rule) => {
+      if (rule.test?.toString().includes("svg")) {
+        return { ...rule, exclude: /\.svg$/i };
+      }
+      return rule;
+    });
+
+    // Add SVGR loader
     config.module.rules.push({
-      test: /\.svg$/i,
-      issuer: /\.[jt]sx?$/,
+      test: /\.svg$/,
       use: ["@svgr/webpack"],
     });
+
     return config;
   },
   images: {
@@ -13,8 +22,8 @@ const nextConfig = {
       {
         protocol: "http",
         hostname: "51.21.132.147",
-        port: "", // leave empty for default (80)
-        pathname: "/**", // optional: restrict to /uploads
+        port: "",
+        pathname: "/**",
       },
     ],
   },

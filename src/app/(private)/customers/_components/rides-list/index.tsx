@@ -115,7 +115,7 @@ export const CustomersList = () => {
 
     useEffect(() => {
         loadCustomers(searchQuery);
-    }, []);
+    }, [searchQuery]);
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             // Simulate API call with client-side filtering
@@ -169,7 +169,7 @@ export const CustomersList = () => {
         );
         obersver.observe(observerRef.current);
         return () => obersver.disconnect();
-    }, [filteredData, currentPage, searchQuery])
+    }, [filteredData, currentPage, searchQuery, hasMore]);
 
     return (
         <div className="flex flex-col mt-6 space-y-6">

@@ -5,6 +5,7 @@ import axiosClient from "@/lib/axiosClient";
 export interface LoginData {
   email: string;
   password: string;
+  user_type?: string;
 }
 
 export async function loginUser(data: LoginData) {

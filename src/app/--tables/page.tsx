@@ -1,3 +1,4 @@
+
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { InvoiceTable } from "@/components/Tables/invoice-table";
 import { TopChannels } from "@/components/Tables/top-channels";
@@ -21,7 +22,7 @@ const TablesPage = () => {
         <Suspense fallback={<TopChannelsSkeleton />}>
           <TopChannels />
         </Suspense>
-        
+
         <Suspense fallback={<TopProductsSkeleton />}>
           <TopProducts />
         </Suspense>

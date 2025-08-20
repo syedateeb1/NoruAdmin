@@ -3,6 +3,7 @@
 import { customersList } from "@/services/customerService";
 import React, { useCallback, useEffect, useState } from "react";
 import { userImage } from "./rides-list";
+import OptimizedImage from "@/components/OtimizedImage";
 
 interface ViewDriverModalProps {
     isOpen: boolean;
@@ -37,11 +38,11 @@ export const ViewTravellerModal: React.FC<ViewDriverModalProps> = ({
     driver,
     driverCompleteData
 }) => {
-    if (!isOpen || !driver) return null;
-    const publicUrl = process.env.NEXT_PUBLIC_API_PUBLIC_URL || "";
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [associatedDriver, setAssociatedDriver] = useState<any[]>([]);
+
+    const publicUrl = process.env.NEXT_PUBLIC_API_PUBLIC_URL || "";
     const getFullUrl = (url?: string) => {
         if (!url) return "";
         return url.startsWith("http") ? url : `${publicUrl}/${url}`;
@@ -96,6 +97,7 @@ export const ViewTravellerModal: React.FC<ViewDriverModalProps> = ({
             })();
         }
     }, [driver, loadCustomers]);
+    if (!isOpen || !driver) return null;
     return (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex justify-center items-center overflow-auto px-4">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6">
@@ -114,11 +116,13 @@ export const ViewTravellerModal: React.FC<ViewDriverModalProps> = ({
                 <div className="grid grid-cols-1   gap-6">
                     <div className="space-y-3 grid grid-cols-2">
                         <div className="flex items-center gap-4">
-                            <img
+
+                            <OptimizedImage
                                 src={getFullUrl(driver?.image)}
                                 alt="Driver"
-                                className="w-24 h-24 rounded-full border object-cover shadow"
-                                onError={(e) => (e.currentTarget.src = "/fallback.png")}
+                                width={96}  // w-24
+                                height={96} // h-24
+                                className="rounded-full w-24  h-24 border object-cover shadow"
                             />
                             <div>
                                 <h3 className="text-xl font-semibold text-gray-800">
@@ -163,14 +167,14 @@ export const ViewTravellerModal: React.FC<ViewDriverModalProps> = ({
                                     key={d._id || i}
                                     className="flex items-center gap-4 p-3 border rounded-xl shadow-sm hover:bg-gray-50 transition"
                                 >
-                                    {/* Driver Image */}
-                                    <img
-                                        src={getFullUrl(d.image)}
-                                        alt={d.name}
-                                        className="w-12 h-12 rounded-full object-cover border"
-                                        onError={(e) => (e.currentTarget.src = "/fallback.png")}
-                                    />
 
+                                    <OptimizedImage
+                                        src={getFullUrl(d?.image)}
+                                        alt={d.name}
+                                        width={48}  // w-24
+                                        height={48} // h-24
+                                        className="rounded-full  h-24 w-24 border object-cover shadow"
+                                    />
                                     {/* Driver Info */}
                                     <div className="flex-1">
                                         <h3 className="text-sm font-semibold text-gray-800">{d.name}</h3>

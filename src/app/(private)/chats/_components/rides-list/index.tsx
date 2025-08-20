@@ -88,7 +88,7 @@ export const RidesList = () => {
         );
         obersver.observe(observerRef.current);
         return () => obersver.disconnect();
-    }, [filteredData, currentPage, searchQuery])
+    }, [filteredData, currentPage, searchQuery, hasMore]);
 
     const formattedData = filteredData.map((item) => ({
         _id: item._id,

@@ -41,7 +41,6 @@ export const RidesList = () => {
     const warnDriver = async (name: string, id: string) => {
         // Add your logic here for warning the driver
         const warnDriver = await updateComplaint(id, "We have warned the driver. Thank you for your feedback.");
-        console.log('Driver warned:', { warnDriver });
         if (warnDriver.status === 200) {
 
             const initialData = await loadCustomers(searchQuery, 1);

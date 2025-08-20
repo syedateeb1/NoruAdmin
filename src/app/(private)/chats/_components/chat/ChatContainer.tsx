@@ -49,7 +49,7 @@ export const ChatContainer = (chat: ChatRoom) => {
 
 
     // Fetch messages
-    const fetchMessages = async (pageNum: number) => {
+    const fetchMessages = React.useCallback(async (pageNum: number) => {
         try {
             setLoading(true);
             const query = `chatroom_id=${chat._id}&page=${pageNum}&limit=10`;
@@ -70,7 +70,7 @@ export const ChatContainer = (chat: ChatRoom) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [chat._id]);
     // After new messages are loaded, check if container still doesn’t scroll
     useEffect(() => {
         if (!containerRef.current || loading || !hasMore) return;
@@ -82,14 +82,14 @@ export const ChatContainer = (chat: ChatRoom) => {
             setPage(nextPage);
             fetchMessages(nextPage);
         }
-    }, [messages, hasMore, loading]);
+    }, [messages, hasMore, loading, page, fetchMessages]);
     // Fetch old messages
     useEffect(() => {
         setMessages([]);
         setPage(1);
         setHasMore(true);
         fetchMessages(1);
-    }, [chat._id]);
+    }, [chat._id, fetchMessages]);
 
     // Infinite scroll (load older msgs when scroll top)
     const handleScroll = () => {

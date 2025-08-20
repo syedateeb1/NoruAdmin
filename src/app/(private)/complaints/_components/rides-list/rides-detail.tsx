@@ -5,6 +5,8 @@ import { EllipsisVertical } from 'lucide-react';
 import { TableCellSkeleton } from '@/components/noru/TableCellSkeleton';
 import Swal from 'sweetalert2';
 import { updateComplaint } from '@/services/complaintService';
+import Image from 'next/image';
+import OptimizedImage from '@/components/OtimizedImage';
 
 interface OptionType {
     id: string;
@@ -75,7 +77,17 @@ export const ComplaintDetail = (props: PropType) => {
             <div className='flex flex-col  mt-2' key={props.innerData?.complaint_from?._id}>
                 <h5 className="font-sans text-heading-8  font-bold text-dark-6 ">Complaing From:</h5>
                 <span className='flex gap-2 items-center'>
-                    {props?.innerData?.complaint_from?.image && (<img className='w-8 h-8 rounded-full' src={props?.innerData?.complaint_from?.image} alt={props.innerData?.complaint_from?.name} />)}
+
+                    {props.innerData?.complaint_from?.image && (
+
+                        <OptimizedImage
+                            src={props.innerData?.complaint_from?.image || ''}
+                            alt={props.innerData?.complaint_from?.image}
+                            width={32}  // w-24
+                            height={32} // h-24
+                            className="rounded-full  w-8 h-8 border object-cover shadow"
+                        />
+                    )}
                     <span className='flex flex-col '>
                         <span className='font-sans text-heading-8 font-bold text-black '>
                             {props.innerData?.complaint_from?.first_name || props.innerData?.complaint_from?.last_name
@@ -88,8 +100,16 @@ export const ComplaintDetail = (props: PropType) => {
             <div className='flex flex-col  mt-2'>
                 <h5 className="font-sans text-heading-8  font-bold text-dark-6 ">Against:</h5>
                 <span className='flex gap-2 items-center'>
-                    {props.innerData?.complaint_gainst?.image && (<img className='w-8 h-8 rounded-full' src={props.innerData?.complaint_gainst?.image} alt={props.innerData?.complaint_gainst?.name} />)}
-                    <span className='flex flex-col '>
+                    {props.innerData?.complaint_gainst?.image && (
+
+                        <OptimizedImage
+                            src={props.innerData?.complaint_gainst?.image || ''}
+                            alt={props.innerData?.complaint_gainst?.image}
+                            width={32}  // w-24
+                            height={32} // h-24
+                            className="rounded-full  w-8 h-8 border object-cover shadow"
+                        />
+                    )}                    <span className='flex flex-col '>
                         <span className='font-sans text-heading-8 font-bold text-black '>
                             {props.innerData?.complaint_gainst?.first_name || props.innerData?.complaint_gainst?.last_name
                                 ? `${props.innerData?.complaint_gainst?.first_name || ''} ${props.innerData?.complaint_gainst?.last_name || ''}`.trim()

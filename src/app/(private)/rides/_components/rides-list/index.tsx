@@ -78,7 +78,7 @@ export const RidesList = () => {
                 setLoading(false);
             }
         },
-        []
+        [currentPage, searchQuery]
     );
 
     // Initial fetch
@@ -90,7 +90,7 @@ export const RidesList = () => {
             // setHasMore(initialData.length === ITEMS_PER_PAGE);
         };
         fetchInitialData();
-    }, [searchQuery, loadCustomers]);
+    }, [searchQuery, loadCustomers, currentPage]);
 
     // Infinite Scroll Observer
     // Infinite Scroll Observer
