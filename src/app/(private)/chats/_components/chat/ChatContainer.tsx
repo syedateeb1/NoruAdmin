@@ -1,5 +1,6 @@
 "use client"
 import { useAuth } from '@/context/AuthContext';
+import { useSocket } from '@/context/SocketContext';
 import { getMessages, sendMessage } from '@/services/chatService';
 import { ChatRoom } from '@/types/chat';
 import Image from 'next/image'
@@ -7,6 +8,8 @@ import React, { useEffect, useRef, useState } from 'react'
 
 export const ChatContainer = (chat: ChatRoom) => {
     const { user } = useAuth()
+    const { socket, isConnected } = useSocket(); // 👈 use socket
+
     const [message, setMessage] = useState(''); // track input
     const [messages, setMessages] = useState<any[]>([]); // chat messages list
     const [page, setPage] = useState(1);
@@ -44,7 +47,6 @@ export const ChatContainer = (chat: ChatRoom) => {
     const userData = getOtherUser(chat);
     const userName = getOtherUserName(chat);
     const userImage = getOtherUserImage(chat);
-    console.log({ chat, user, userData, userName, userImage })
 
 
 
@@ -71,25 +73,8 @@ export const ChatContainer = (chat: ChatRoom) => {
             setLoading(false);
         }
     }, [chat._id]);
-    // After new messages are loaded, check if container still doesn’t scroll
-    useEffect(() => {
-        if (!containerRef.current || loading || !hasMore) return;
 
-        const container = containerRef.current;
-        // If content height <= container height => fetch more automatically
-        if (container.scrollHeight <= container.clientHeight) {
-            const nextPage = page + 1;
-            setPage(nextPage);
-            fetchMessages(nextPage);
-        }
-    }, [messages, hasMore, loading, page, fetchMessages]);
-    // Fetch old messages
-    useEffect(() => {
-        setMessages([]);
-        setPage(1);
-        setHasMore(true);
-        fetchMessages(1);
-    }, [chat._id, fetchMessages]);
+
 
     // Infinite scroll (load older msgs when scroll top)
     const handleScroll = () => {
@@ -101,11 +86,6 @@ export const ChatContainer = (chat: ChatRoom) => {
             fetchMessages(nextPage);
         }
     };
-    useEffect(() => {
-        if (isUserNearBottom()) {
-            scrollToBottom();
-        }
-    }, [messages]);
 
     // Check if user is near bottom
     const isUserNearBottom = () => {
@@ -113,14 +93,6 @@ export const ChatContainer = (chat: ChatRoom) => {
         const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
         return scrollHeight - scrollTop - clientHeight < 100; // within 100px
     };
-    // Attach scroll listener
-    useEffect(() => {
-        const div = containerRef.current;
-        if (!div) return;
-
-        div.addEventListener("scroll", handleScroll);
-        return () => div.removeEventListener("scroll", handleScroll);
-    });
     // Send message handler
     const handleSend = async () => {
         if (!message.trim()) return; // prevent empty message
@@ -134,15 +106,90 @@ export const ChatContainer = (chat: ChatRoom) => {
             const res = await sendMessage(formData);
 
             // Optimistically add message to UI
-            setMessages((prev) => [...prev, res]);
+            // setMessages((prev) => [...prev, res]);
             setMessage('');
+
+            // Immediately mark as read so unread_count stays 0 on server
+            socket?.emit("read", { chatroom_id: chat._id, user_id: user?._id, message_id: res._id });
         } catch (err) {
             console.error('Failed to send message', err);
         } finally {
             setLoading(false);
         }
     };
-    console.log({ messages })
+
+    // After new messages are loaded, check if container still doesn’t scroll
+    useEffect(() => {
+        if (!containerRef.current || loading || !hasMore) return;
+
+        const container = containerRef.current;
+        // If content height <= container height => fetch more automatically
+        if (container.scrollHeight <= container.clientHeight) {
+            const nextPage = page + 1;
+            setPage(nextPage);
+            fetchMessages(nextPage);
+        }
+    }, [messages, hasMore, loading, page, fetchMessages]);
+    // Attach scroll listener
+    useEffect(() => {
+        const div = containerRef.current;
+        if (!div) return;
+
+        div.addEventListener("scroll", handleScroll);
+        return () => div.removeEventListener("scroll", handleScroll);
+    });
+    useEffect(() => {
+        if (isUserNearBottom()) {
+            scrollToBottom();
+        }
+    }, [messages]);
+    // Fetch old messages
+    useEffect(() => {
+        setMessages([]);
+        setPage(1);
+        setHasMore(true);
+        fetchMessages(1);
+    }, [chat._id, fetchMessages]);
+
+    useEffect(() => {
+        if (!socket || !chat?._id || !user?._id) return;
+
+        socket.emit("join-room", chat._id); // 👈 matches Flutter code
+
+        // 2) When opening the chat, immediately mark as read on the server
+        //    so unread_count stays 0 while you're here.
+
+        socket.emit("read", { chatroom_id: chat._id, user_id: user._id });
+
+        const handleNewMessage = (data: any) => {
+            const roomId = data.chatroom_id || data.chatroom?._id || data.room_id;
+            if (roomId !== chat._id) return;
+            setMessages((prev) => {
+                if (prev.some((m) => m._id === data._id)) return prev;
+                return [...prev, data];
+            });
+            scrollToBottom();
+            // 3) Tell server we just saw it; keeps unread_count at 0 on server
+            socket.emit("read", { chatroom_id: chat._id, user_id: user._id, message_id: data._id });
+        };
+
+        socket.on("messages", handleNewMessage);
+
+        return () => {
+            socket.off("messages", handleNewMessage);
+            socket.emit("leave-room", chat._id); // optional if server supports
+        };
+    }, [socket, chat?._id, user?._id]);
+
+    // OPTIONAL: whenever the last message in this chat changes (e.g., page fetch),
+    // send a read ack (covers initial fetch and edge cases)
+    useEffect(() => {
+        if (!socket || !chat?._id || !user?._id) return;
+        const last = messages[messages.length - 1];
+        if (last?._id) {
+            socket.emit("read", { chatroom_id: chat._id, user_id: user._id, message_id: last._id });
+        }
+    }, [messages.length, socket, chat._id, user?._id]);
     // Sort messages by time (ascending)
     const sortedMessages = [...messages].sort(
         (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -169,11 +216,11 @@ export const ChatContainer = (chat: ChatRoom) => {
 
 
                 {/* Sorted messages (oldest → newest) */}
-                {sortedMessages.map((msg) => {
+                {sortedMessages.map((msg, key) => {
                     const isOwnMessage = msg.sender_id?._id === user?._id;
                     return (
                         <div
-                            key={msg._id}
+                            key={key}
                             className={`p-2 rounded-2xl mb-2 max-w-xs break-words ${isOwnMessage
                                 ? "bg-blue-500 text-white self-end"
                                 : "bg-gray-200 text-black self-start"

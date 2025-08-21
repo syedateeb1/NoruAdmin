@@ -10,6 +10,7 @@ import { getChatRooms } from "@/services/chatService";
 export default function Home() {
   const [selectedChat, setSelectedChat] = useState<ChatRoom | null>(null);
   const [allChats, setAllChats] = useState<ChatRoom[]>([]);
+
   const handleSelectChat = (id: string) => {
     const chat = allChats.find((c) => c._id === id);
 
