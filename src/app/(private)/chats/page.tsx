@@ -10,7 +10,13 @@ import { getChatRooms } from "@/services/chatService";
 export default function Home() {
   const [selectedChat, setSelectedChat] = useState<ChatRoom | null>(null);
   const [allChats, setAllChats] = useState<ChatRoom[]>([]);
-
+  const handleMarkAsRead = (chatId: string) => {
+    setAllChats((prev) =>
+      prev.map((c) =>
+        c._id === chatId ? { ...c, unread_count: 0 } : c
+      )
+    );
+  };
   const handleSelectChat = (id: string) => {
     const chat = allChats.find((c) => c._id === id);
 
@@ -40,7 +46,7 @@ export default function Home() {
             onSelect={handleSelectChat}
             activeId={selectedChat?._id ?? ''}
           />
-          {selectedChat && <ChatContainer {...selectedChat} />}
+          {selectedChat && <ChatContainer {...selectedChat} onReadChat={handleMarkAsRead} />}
         </div>
       </ProtectedRoute>
     </>

@@ -103,40 +103,30 @@ const ChatSideBar = ({ chats, onSelect, activeId }: Props) => {
 
         return () => clearTimeout(timer);
     }, [search, chats, user?._id, getOtherUserName]); // Add user._id to dependencies
+
     useEffect(() => {
-        if (!socket || !user?._id) return;
-
-
-        // Tell backend you want chat updates for this user
-        socket.emit("join-room", user._id);
-
+        if (!socket) return;
 
         const handleChatUpdate = (updatedChat: any) => {
-            setFilteredChats((prev) => {
-                const exists = prev.some((c) => c._id === updatedChat._id);
-                const next = exists
-                    ? prev.map((chat) => {
-                        if (chat._id !== updatedChat._id) return chat;
-
-                        // If the updated chat is the ACTIVE one, force unread_count to 0 locally
-                        // so UI never shows a badge while you're inside.
-                        if (updatedChat._id === activeId) {
+            setFilteredChats((prev) =>
+                prev.map((chat) => {
+                    if (chat._id === updatedChat._id) {
+                        // If it's the active chat → force unread_count = 0
+                        if (chat._id === activeId) {
                             return { ...chat, ...updatedChat, unread_count: 0 };
                         }
                         return { ...chat, ...updatedChat };
-                    })
-                    : [updatedChat, ...prev]; // if server pushes a new chat you didn't have yet
-                return next;
-            });
+                    }
+                    return chat;
+                })
+            );
         };
 
-        socket.on("chats", handleChatUpdate);
-
+        // Return a destructor function that cleans up the event listener
         return () => {
-            socket.off("chats", handleChatUpdate);
-            socket.emit("leave-room", user._id); // optional if server supports
+            socket?.off("chatUpdate", handleChatUpdate);
         };
-    }, [socket, user?._id, activeId]);
+    }, [socket, activeId]);
 
     return (
         <div className="w-80 flex flex-col h-full bg-white border-r">

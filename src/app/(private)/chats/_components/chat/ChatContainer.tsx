@@ -6,7 +6,9 @@ import { ChatRoom } from '@/types/chat';
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 
-export const ChatContainer = (chat: ChatRoom) => {
+export const ChatContainer = (
+    chat: ChatRoom & { onReadChat?: (id: string) => void }
+) => {
     const { user } = useAuth()
     const { socket, isConnected } = useSocket(); // 👈 use socket
 
@@ -160,6 +162,7 @@ export const ChatContainer = (chat: ChatRoom) => {
         //    so unread_count stays 0 while you're here.
 
         socket.emit("read", { chatroom_id: chat._id, user_id: user._id });
+        chat.onReadChat?.(chat._id);   // 👈 reset in sidebar too
 
         const handleNewMessage = (data: any) => {
             const roomId = data.chatroom_id || data.chatroom?._id || data.room_id;
@@ -171,6 +174,8 @@ export const ChatContainer = (chat: ChatRoom) => {
             scrollToBottom();
             // 3) Tell server we just saw it; keeps unread_count at 0 on server
             socket.emit("read", { chatroom_id: chat._id, user_id: user._id, message_id: data._id });
+            // 👇 Tell sidebar unread_count = 0
+            chat.onReadChat?.(chat._id);
         };
 
         socket.on("messages", handleNewMessage);
