@@ -46,6 +46,7 @@ const InputGroupAnimated: React.FC<InputGroupProps> = ({
     const isPassword = type === "password";
     const [showPassword, setShowPassword] = useState(false);
     const inputType = isPassword ? (showPassword ? "text" : "password") : type;
+    const autoComplete = isPassword ? "new-password" : "off";
 
     return (
         <div className={cn("relative w-full", className)}>
@@ -59,9 +60,11 @@ const InputGroupAnimated: React.FC<InputGroupProps> = ({
                     onChange?.(e);
                     setIsFloating(e.target.value.length > 0);
                 }}
+                autoComplete={autoComplete}
+
                 placeholder=" "
                 className={cn(
-                    "peer w-full rounded-md border border-gray-300 px-11 pt-[18px] pb-[6px] text-sm text-gray-900 bg-transparent  placeholder-transparent",
+                    "peer w-full rounded-md border border-gray-300 pl-14 pr-11 pt-[18px] pb-[6px] text-sm text-gray-900 bg-transparent placeholder-transparent",
                     "focus:border-[#7b61ff] focus:ring-0 focus:outline-none",
                     "disabled:bg-gray-100 disabled:cursor-not-allowed",
                     error && "border-red-500 focus:border-red-500"
@@ -72,10 +75,10 @@ const InputGroupAnimated: React.FC<InputGroupProps> = ({
             <label
                 htmlFor={id}
                 className={cn(
-                    "pointer-events-none absolute bg-white p-1 left-11 top-[14px] text-sm text-gray-500 transition-all duration-200",
+                    "pointer-events-none absolute bg-white p-1 left-14 top-[14px] text-sm text-gray-500 transition-all duration-200",
                     "peer-placeholder-shown:top-[8px] peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400",
-                    "peer-focus:top-[-6px] peer-focus:left-5 peer-focus:text-xs peer-focus:text-[#7b61ff]",
-                    isFloating && "top-[-6px] left-5 text-xs text-[#7b61ff]"
+                    "peer-focus:top-[-6px]  peer-focus:text-xs peer-focus:text-[#7b61ff]",
+                    isFloating && "top-[-6px] text-xs text-[#7b61ff]"
                 )}
             >
                 {label}
