@@ -191,13 +191,37 @@ export const DriversList = () => {
                 }
                 break;
             case "approve":
-                const resp = await approveDriver(id, status === "block");
-                console.log({ id, status, resp });
-                const initialData2 = await loadCustomers(searchQuery);
-                setDrivers(initialData2);
-                if (resp.status === 200) {
-                    return resp.data
+
+                const confirmApprove = await Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, Approve it!",
+                });
+
+                if (confirmApprove.isConfirmed) {
+                    let statusMessage = status === "block" ? "The Driver has been Blocked" : "The Driver has been Approved";
+                    const resp = await approveDriver(id, status === "block" ? false : true);
+                    let statusTitle = status === "block" ? "Blocked" : "Approved";
+                    const initialData2 = await loadCustomers(searchQuery);
+                    setDrivers(initialData2);
+                    if (resp.status === 200) {
+                        Swal.fire({
+                            title: statusTitle,
+                            text: statusMessage,
+                            icon: "success",
+                            timer: 1500,
+                            showConfirmButton: false,
+                        });
+                        return resp.data
+                    }
+
+
                 }
+
 
         }
 
@@ -215,7 +239,7 @@ export const DriversList = () => {
                 className={scrollDiv}
             >
                 {drivers.map((item, index) => (
-                    <div key={item._id} className="min-w-[1200px]">
+                    <div key={item._id} className="min-w-[1200px]   relative">
                         <RidesDetail
                             _id={item._id}
                             innerData={item}

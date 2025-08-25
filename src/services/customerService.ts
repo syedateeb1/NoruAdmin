@@ -46,7 +46,7 @@ export async function updateDriver(id: string, status: boolean) {
 }
 export async function approveDriver(id: string, status: boolean) {
   try {
-    const response = await axiosClient.patch(`/admin/block/${id}`, {
+    const response = await axiosClient.patch(`/admin/approve/${id}`, {
       approved: status,
     });
     return response.data;

@@ -3,7 +3,7 @@ import { Search, Loader2 } from "lucide-react";
 import { RidesDetail } from "./rides-detail"
 import { useCallback, useEffect, useRef, useState } from "react";
 import data from "../../fetch.json"
-import { customersList, deleteCustomer, updateDriver } from "@/services/customerService";
+import { approveDriver, customersList, deleteCustomer, updateDriver } from "@/services/customerService";
 import Swal from "sweetalert2";
 import { inputCss, scrollDiv } from "@/utils/constants";
 import SearchInput from "@/components/SearchComponent";
@@ -151,7 +151,7 @@ export const RidesList = () => {
     }, [scrollContainerRef, currentPage, hasMore, isLoadingMore, searchQuery, loadCustomers]);
 
     const onClickHandle = async (name: string, id: string, status?: string) => {
-        console.log(name, id, status, "name");
+        console.log(name, "name");
         switch (name) {
             case "block":
                 await updateDriver(id, status !== "block");
@@ -193,6 +193,38 @@ export const RidesList = () => {
                     setIsViewModalOpen(true);
                 }
                 break;
+            case "approve":
+
+                console.log("🚀 ~ file: index.tsx ~ line 94 ~ onClickHandle ~ status", status)
+                const confirmApprove = await Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, Approve it!",
+                });
+
+                if (confirmApprove.isConfirmed) {
+                    let statusMessage = status === "block" ? "The Traveller has been Blocked" : "The Traveller has been Approved";
+                    const resp = await approveDriver(id, status === "block" ? false : true);
+                    let statusTitle = status === "block" ? "Blocked" : "Approved";
+                    const initialData2 = await loadCustomers(searchQuery);
+                    setDrivers(initialData2);
+                    if (resp.status === 200) {
+                        Swal.fire({
+                            title: statusTitle,
+                            text: statusMessage,
+                            icon: "success",
+                            timer: 1500,
+                            showConfirmButton: false,
+                        });
+                        return resp.data
+                    }
+
+
+                }
         }
 
     };
@@ -211,7 +243,7 @@ export const RidesList = () => {
                 className={scrollDiv}
             >
                 {drivers.map((item, index) => (
-                    <div key={item._id} className="min-w-[1200px]">
+                    <div key={item._id} className="min-w-[1200px]  ">
                         <RidesDetail
                             _id={item._id}
                             innerData={item}
@@ -234,6 +266,8 @@ export const RidesList = () => {
                         onClose={() => setIsViewModalOpen(false)}
                         driver={selectedDriver}
                         driverCompleteData={driverCompleteData}
+                        onClickHandle={onClickHandle}
+
                     />
                 )}
             </div>

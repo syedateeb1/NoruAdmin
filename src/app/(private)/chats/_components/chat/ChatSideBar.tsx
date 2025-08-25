@@ -46,7 +46,6 @@ const ChatSideBar = ({ chats, onSelect, activeId }: Props) => {
     const getOtherUserName = useCallback(
         (chat: ChatRoom) => {
             const otherUser = getOtherUser(chat);
-            console.log({ chat, otherUser });
 
             // Case 1: otherUser exists and has first_name
             if (otherUser && "first_name" in otherUser && otherUser.first_name) {
@@ -106,7 +105,6 @@ const ChatSideBar = ({ chats, onSelect, activeId }: Props) => {
 
     useEffect(() => {
         if (!socket) return;
-
         const handleChatUpdate = (updatedChat: any) => {
             setFilteredChats((prev) =>
                 prev.map((chat) => {
@@ -127,7 +125,34 @@ const ChatSideBar = ({ chats, onSelect, activeId }: Props) => {
             socket?.off("chatUpdate", handleChatUpdate);
         };
     }, [socket, activeId]);
+    useEffect(() => {
+        if (!socket || !user?._id) return;
 
+        // Wait for socket to connect
+        socket.on("connect", () => {
+            console.log("Socket connected, joining room...");
+            socket.emit("join-room", user._id); // Emit after connection
+        });
+
+        const handleInitialChats = (incoming: ChatRoom[] | ChatRoom) => {
+            setFilteredChats(prev => {
+                // Normalize: always an array
+                const incomingArray = Array.isArray(incoming) ? incoming : [incoming];
+
+                return prev.map(chat => {
+                    const match = incomingArray.find(c => c._id === chat._id);
+                    return match ? { ...chat, ...match } : chat;
+                });
+            });
+        };
+
+        socket.on("chats", handleInitialChats); // Adjust event name based on server
+
+        return () => {
+            socket.off("chats", handleInitialChats);
+            socket.off("connect"); // Clean up connect listener
+        };
+    }, [socket, user?._id]);
     return (
         <div className="w-80 flex flex-col h-full bg-white border-r">
             <div className='mx-6 space-y-4'>

@@ -155,36 +155,43 @@ export const ChatContainer = (
 
     useEffect(() => {
         if (!socket || !chat?._id || !user?._id) return;
+        // ✅ Join the current room
+        socket.emit("join-room", chat._id);
 
-        socket.emit("join-room", chat._id); // 👈 matches Flutter code
-
-        // 2) When opening the chat, immediately mark as read on the server
-        //    so unread_count stays 0 while you're here.
-
-        socket.emit("read", { chatroom_id: chat._id, user_id: user._id });
-        chat.onReadChat?.(chat._id);   // 👈 reset in sidebar too
+        // ✅ Mark as read when chat opens
+        socket.emit("read", chat._id);
+        chat.onReadChat?.(chat._id); // update sidebar badge
 
         const handleNewMessage = (data: any) => {
             const roomId = data.chatroom_id || data.chatroom?._id || data.room_id;
+
+            // Ignore if not the current chat
             if (roomId !== chat._id) return;
+
+            // ✅ Append only if not already added
             setMessages((prev) => {
                 if (prev.some((m) => m._id === data._id)) return prev;
                 return [...prev, data];
             });
+
             scrollToBottom();
-            // 3) Tell server we just saw it; keeps unread_count at 0 on server
-            socket.emit("read", { chatroom_id: chat._id, user_id: user._id, message_id: data._id });
-            // 👇 Tell sidebar unread_count = 0
+
+            // ✅ Mark message as read immediately
+            socket.emit("read", chat._id);
+
+            // ✅ Update sidebar’s unread counter
             chat.onReadChat?.(chat._id);
         };
 
+        // Listen for new messages
         socket.on("messages", handleNewMessage);
 
         return () => {
             socket.off("messages", handleNewMessage);
-            socket.emit("leave-room", chat._id); // optional if server supports
+            socket.emit("leave-room", chat._id); // optional
         };
     }, [socket, chat?._id, user?._id]);
+
 
     // OPTIONAL: whenever the last message in this chat changes (e.g., page fetch),
     // send a read ack (covers initial fetch and edge cases)

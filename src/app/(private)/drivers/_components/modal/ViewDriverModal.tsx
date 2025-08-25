@@ -27,10 +27,9 @@ export const ViewDriverModal: React.FC<ViewDriverModalProps> = ({
         if (!url) return "";
         return url.startsWith("http") ? url : `${publicUrl}/${url}`;
     };
-    const approveFn = async () => {
+    const approveFn = async (status: "approve" | "block") => {
         if (onClickHandle) {
-            const resp = await onClickHandle(driver._id, "approve", driver.approved ? "approve" : "block");
-            console.log(resp.approved);
+            const resp = await onClickHandle(driver._id, "approve", status);
             driver.approved = resp.approved
         }
     };
@@ -172,7 +171,7 @@ export const ViewDriverModal: React.FC<ViewDriverModalProps> = ({
                                     height={112}  // h-28 = 7rem
                                     className="object-cover rounded-lg shadow border"
                                 />
-                            ))}
+                            ))} 
                         </div>
                     </div>
                 )}
@@ -190,8 +189,9 @@ export const ViewDriverModal: React.FC<ViewDriverModalProps> = ({
                         />
                     </div>
                 )}
-                <div className="flex justify-end">
-                    <StatusBadge status={driver?.approved ? "blocked" : "approve"} className="cursor-pointer" onClick={approveFn} />
+                <div className="flex justify-end gap-4">
+                    <StatusBadge status={"approve"} className="cursor-pointer" onClick={() => approveFn("approve")} />
+                    <StatusBadge status={"blocked"} className="cursor-pointer" onClick={() => approveFn("block")} />
                 </div>
             </div>
         </div>

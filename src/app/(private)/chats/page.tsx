@@ -8,15 +8,21 @@ import { getChatRooms } from "@/services/chatService";
 
 
 export default function Home() {
+
   const [selectedChat, setSelectedChat] = useState<ChatRoom | null>(null);
   const [allChats, setAllChats] = useState<ChatRoom[]>([]);
   const handleMarkAsRead = (chatId: string) => {
+
     setAllChats((prev) =>
       prev.map((c) =>
         c._id === chatId ? { ...c, unread_count: 0 } : c
       )
     );
+
   };
+  useEffect(() => {
+    console.log("✅ allChats updated:", allChats);
+  }, [allChats]);
   const handleSelectChat = (id: string) => {
     const chat = allChats.find((c) => c._id === id);
 

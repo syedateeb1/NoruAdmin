@@ -4,12 +4,14 @@ import { customersList } from "@/services/customerService";
 import React, { useCallback, useEffect, useState } from "react";
 import { userImage } from "./rides-list";
 import OptimizedImage from "@/components/OtimizedImage";
+import { StatusBadge } from "@/components/StatusBadge";
 
 interface ViewDriverModalProps {
     isOpen: boolean;
     onClose: () => void;
     driver?: any; // ideally, type this better if you have types
     driverCompleteData?: any
+    onClickHandle?: (name: string, id: string, status?: string) => Promise<any>;
 }
 const pCss = "flex items-center gap-2"
 const ITEMS_PER_PAGE = 8;
@@ -36,6 +38,7 @@ export const ViewTravellerModal: React.FC<ViewDriverModalProps> = ({
     isOpen,
     onClose,
     driver,
+    onClickHandle,
     driverCompleteData
 }) => {
     const [loading, setLoading] = useState(false);
@@ -98,6 +101,12 @@ export const ViewTravellerModal: React.FC<ViewDriverModalProps> = ({
         }
     }, [driver, loadCustomers]);
     if (!isOpen || !driver) return null;
+    const approveFn = async (status: "approve" | "block") => {
+        if (onClickHandle) {
+            const resp = await onClickHandle("approve", driver._id, status);
+            // driver.approved = resp.approved
+        }
+    };
     return (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex justify-center items-center overflow-auto px-4">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6">
@@ -139,7 +148,10 @@ export const ViewTravellerModal: React.FC<ViewDriverModalProps> = ({
                             <p><strong>Income:</strong> ${driver?.income ?? 0}</p>
                         </div>
                     </div>
-
+                    <div className="flex justify-end gap-4">
+                        <StatusBadge status={"approve"} className="cursor-pointer" onClick={() => approveFn("approve")} />
+                        <StatusBadge status={"blocked"} className="cursor-pointer" onClick={() => approveFn("block")} />
+                    </div>
                     {/* <div className="space-y-2 text-sm text-gray-700">
                         <h4 className="font-semibold text-gray-800 border-b pb-1">Emergency Contact</h4>
                         <p><strong>Name:</strong> {driver?.driver_info?.emergency_contact_name || "N/A"}</p>

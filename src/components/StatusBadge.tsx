@@ -14,13 +14,13 @@ interface StatusBadgeProps {
 }
 
 const statusStyles: { [key in StatusType]?: string } = {
-    active: "bg-green-200 text-green-700",
-    approve: "bg-green-200 text-green-700",
-    blocked: "bg-red-200 text-red-700",
-    assigned: "bg-green-200 text-green-700",
-    open: "bg-blue-200 text-blue-700",
-    completed: "bg-purple-200 text-purple-700",
-    cancelled: "bg-red-200 text-red-700",
+    active: "bg-green-200 text-green-700  rounded-full",
+    approve: "bg-green-200 text-green-700 hover:bg-green-300 hover:shadow-md rounded-lg",
+    blocked: "bg-red-200 text-red-700 hover:bg-red-300 hover:shadow-md  rounded-lg",
+    assigned: "bg-green-200 text-green-700 rounded-full",
+    open: "bg-blue-200 text-blue-700 rounded-full",
+    completed: "bg-purple-200 text-purple-700 rounded-full",
+    cancelled: "bg-red-200 text-red-700 rounded-full",
 };
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({
@@ -33,7 +33,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     const label = customLabels[status] || status.charAt(0).toUpperCase() + status.slice(1);
 
     return (
-        <div className={`inline-block px-5 py-2 rounded-full font-sans text-body-lg font-semibold ${style} ${className}`} onClick={onClick}>
+        <div className={`inline-block px-5 py-2 font-sans text-body-lg font-semibold ${style} ${className}`} onClick={onClick}>
             <p>{label}</p>
         </div>
     );

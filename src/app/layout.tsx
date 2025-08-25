@@ -15,11 +15,14 @@ import { ToastContainer } from "react-toastify";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Laundary Admin Panel",
-    default: "Laundary Admin Panel",
+    template: "%s | Noru Admin Panel",
+    default: "Noru Admin Panel",
   },
   description:
     "Next.js admin dashboard toolkit with 200+ templates, UI components, and integrations for fast dashboard development.",
+  icons: {
+    // icon: "/logo.png", // 👈 your logo path from public/
+  },
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {

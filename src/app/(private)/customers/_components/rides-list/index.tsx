@@ -183,7 +183,7 @@ export const CustomersList = () => {
                 {customers.map((item, index) => {
                     return (
                         <div key={index} className="">
-                            <div className="min-w-[1200px]">
+                            <div className="min-w-[1200px] ">
                                 <RidesDetail
                                     key={index}
                                     _id={item._id}
