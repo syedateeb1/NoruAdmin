@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  basePath: "/admin",
+  assetPrefix: "/admin",
   webpack(config) {
     // Remove existing SVG handling
     config.module.rules = config.module.rules.map((rule) => {
