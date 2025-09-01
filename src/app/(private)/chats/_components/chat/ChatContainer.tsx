@@ -190,7 +190,7 @@ export const ChatContainer = (
             socket.off("messages", handleNewMessage);
             socket.emit("leave-room", chat._id); // optional
         };
-    }, [socket, chat?._id, user?._id]);
+    }, [socket, chat, user?._id]);
 
 
     // OPTIONAL: whenever the last message in this chat changes (e.g., page fetch),
@@ -201,7 +201,7 @@ export const ChatContainer = (
         if (last?._id) {
             socket.emit("read", { chatroom_id: chat._id, user_id: user._id, message_id: last._id });
         }
-    }, [messages.length, socket, chat._id, user?._id]);
+    }, [messages, socket, chat._id, user?._id]);
     // Sort messages by time (ascending)
     const sortedMessages = [...messages].sort(
         (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()

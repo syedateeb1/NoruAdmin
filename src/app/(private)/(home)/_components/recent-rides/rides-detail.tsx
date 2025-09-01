@@ -41,49 +41,51 @@ export const RidesDetail = (props: PropType) => {
     };
 
     return (
-        <div className="flex flex-row items-center justify-between w-full bg-white py-2 px-4 rounded-2xl relative">
-            {props.innerData.map((item, index) => (
-                <div key={index} className={`flex-1 px-1 flex items-end ${item.heading === "Fare" ? "justify-center" : "justify-start"}`}>
-                    <RidesDetailSkeleton heading={item.heading} name={item.name} />
-                </div>
-            ))}
-            <div className="flex  items-end justify-center gap-2 flex-1  ">
-                <div
-                    className={`inline-block px-5 py-2 rounded-full font-sans text-body-lg font-semibold ${props.status === "assigned"
-                        ? "bg-green-200 text-green-700"
-                        : props.status === "open"
-                            ? "bg-blue-200 text-blue-700"
-                            : props.status === "completed"
-                                ? "bg-purple-200 text-purple-700"
-                                : "bg-red-200 text-red-700" // cancelled
-                        }`}
-                >
-                    <p>{props.status}</p>
-                </div>
+        <div className="w-full overflow-x-auto">
+            <div className="flex flex-row items-center justify-between min-w-max bg-white py-2 px-4 rounded-2xl relative">
+                {props.innerData.map((item, index) => (
+                    <div key={index} className={`flex-1 px-1 flex items-end ${item.heading === "Fare" ? "justify-center" : "justify-start"}`}>
+                        <RidesDetailSkeleton heading={item.heading} name={item.name} />
+                    </div>
+                ))}
+                <div className="flex  items-end justify-center gap-2 flex-1  ">
+                    <div
+                        className={`inline-block px-5 py-2 rounded-full font-sans text-body-lg font-semibold ${props.status === "assigned"
+                            ? "bg-green-200 text-green-700"
+                            : props.status === "open"
+                                ? "bg-blue-200 text-blue-700"
+                                : props.status === "completed"
+                                    ? "bg-purple-200 text-purple-700"
+                                    : "bg-red-200 text-red-700" // cancelled
+                            }`}
+                    >
+                        <p>{props.status}</p>
+                    </div>
 
+                </div>
+                {props.option && (<div className="flex items-end justify-center ga  -2 flex-1">
+
+
+                    <button onClick={handleIconClick} aria-label="More options">
+                        <EllipsisVertical className="w-5 h-5 text-dark-4 hover:text-primary cursor-pointer" />
+                    </button>
+
+                </div>
+                )}
+                {isMenuOpen && props.options && (
+                    <div className="absolute right-4 top-12 bg-white shadow-lg rounded-lg p-2 z-10 flex-1">
+                        {props.options.map((option, index) => (
+                            <button
+                                key={index}
+                                onClick={() => handleOptionClick(option.id, props._id)}
+                                className="block w-full text-left px-4 py-2 text-body-sm font-sans font-medium text-dark-4 hover:bg-gray-1 rounded"
+                            >
+                                {option.label}
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
-            {props.option && (<div className="flex items-end justify-center ga  -2 flex-1">
-
-
-                <button onClick={handleIconClick} aria-label="More options">
-                    <EllipsisVertical className="w-5 h-5 text-dark-4 hover:text-primary cursor-pointer" />
-                </button>
-
-            </div>
-            )}
-            {isMenuOpen && props.options && (
-                <div className="absolute right-4 top-12 bg-white shadow-lg rounded-lg p-2 z-10 flex-1">
-                    {props.options.map((option, index) => (
-                        <button
-                            key={index}
-                            onClick={() => handleOptionClick(option.id, props._id)}
-                            className="block w-full text-left px-4 py-2 text-body-sm font-sans font-medium text-dark-4 hover:bg-gray-1 rounded"
-                        >
-                            {option.label}
-                        </button>
-                    ))}
-                </div>
-            )}
         </div>
     );
 };

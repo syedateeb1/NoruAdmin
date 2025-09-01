@@ -5,6 +5,7 @@ import { EllipsisVertical } from 'lucide-react';
 import { TableCellSkeleton } from '@/components/noru/TableCellSkeleton';
 import { StatusBadge } from '@/components/StatusBadge';
 import { createPortal } from 'react-dom';
+import Swal from 'sweetalert2';
 
 interface OptionType {
     id: string;
@@ -31,6 +32,7 @@ interface propDataType {
     status: string,
     drivers: string,
     vehicles: string,
+    role?: string,
     jobs: string
 }
 
@@ -43,10 +45,28 @@ export const RidesDetail = (props: PropType) => {
     const scrollParentsRef = useRef<(Element | Window)[]>([]);
 
     const handleIconClick = () => setIsMenuOpen((p) => !p);
-    const handleOptionClick = (name: string, id: string, status?: string) => {
+    const handleOptionClick = (name: string, id: string, status?: string, role?: string | number) => {
+        if (role === 1) {
+            Swal.fire("Error", "You can't delete Admin", "error");
+            return
+        }
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // ✅ Only run when user confirms
+                props.onClick?.(name, id, status);
 
-        props.onClick?.(name, id, status);
-        setIsMenuOpen(false);
+                Swal.fire("Deleted!", "The account has been deleted.", "success");
+            }
+            setIsMenuOpen(false);
+        });
     };
     const getScrollParents = (el: HTMLElement | null) => {
         const parents: (Element | Window)[] = [];
@@ -160,7 +180,7 @@ export const RidesDetail = (props: PropType) => {
             </div>
             <div className=" flex items-center justify-end">
 
-                <StatusBadge status={props.status === "block" ? "blocked" : "active"} />
+                <StatusBadge status={props.status === "block" ? "blocked" : "active"} type='badge' />
 
             </div>
             {props.option && (
@@ -172,7 +192,7 @@ export const RidesDetail = (props: PropType) => {
 
                 </div>
             )}
-            {isMenuOpen && props.options && (
+            {/* {isMenuOpen && props.options && (
                 <div ref={menuRef} className="absolute right-4 top-12 bg-white shadow-lg rounded-lg p-2 z-10 flex-1">
                     {props.options.map((option, index) => (
                         <button
@@ -184,7 +204,7 @@ export const RidesDetail = (props: PropType) => {
                         </button>
                     ))}
                 </div>
-            )}
+            )} */}
             {isMenuOpen && props.options &&
                 createPortal(
                     <div
@@ -195,7 +215,7 @@ export const RidesDetail = (props: PropType) => {
                         {props.options.map((option, index) => (
                             <button
                                 key={index}
-                                onClick={() => handleOptionClick(option.id, props._id, props.status == "block" ? "active" : "block")}
+                                onClick={() => handleOptionClick(option.id, props._id, props.status == "block" ? "active" : "block", props.innerData?.role)}
                                 className="block w-full text-left px-4 py-2 text-body-sm font-sans font-medium text-dark-4 hover:bg-gray-1 rounded"
                             >
                                 {option.label === "Traveller" ? props.status == "block" ? "Unblock" : "Block" : ""}   {option.label}
@@ -204,46 +224,7 @@ export const RidesDetail = (props: PropType) => {
                     </div>,
                     document.body
                 )}
-            {/* {props.innerData.map((item, index) => (
-                    <div key={index} className={`flex-1 flex items-end justify-start`}>
-                        <RidesDetailSkeleton image={item.image} heading={item.heading} name={item.name} />
-                    </div>
-                ))}
-                <div className="flex  items-end justify-center gap-2 flex-1  ">
-                    <div
-                        className={`inline-block px-3 py-1 rounded-full ${props.status === 'completed'
-                            ? 'bg-green-200 text-green-700'
-                            : props.status === 'inprogress'
-                                ? 'bg-yellow-200 text-yellow-700'
-                                : 'bg-red-200 text-red-700'
-                            }`}
-                    >
-                        <p className="font-sans text-caption font-semibold">{props.status}</p>
-                    </div>
 
-                </div>
-                {props.option && (<div className="flex items-end justify-center ga  -2 flex-1">
-
-
-                    <button onClick={handleIconClick} aria-label="More options">
-                        <EllipsisVertical className="w-5 h-5 text-dark-4 hover:text-primary cursor-pointer" />
-                    </button>
-
-                </div>
-                )}
-                {isMenuOpen && props.options && (
-                    <div className="absolute right-4 top-12 bg-white shadow-lg rounded-lg p-2 z-10 flex-1">
-                        {props.options.map((option, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handleOptionClick(option.id, props._id)}
-                                className="block w-full text-left px-4 py-2 text-body-sm font-sans font-medium text-dark-4 hover:bg-gray-1 rounded"
-                            >
-                                {option.label}
-                            </button>
-                        ))}
-                    </div>
-                )} */}
         </div>
     );
 };

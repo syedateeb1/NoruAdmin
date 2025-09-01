@@ -2,7 +2,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { useSocket } from '@/context/SocketContext';
 import { Chat, ChatRoom, Message } from '@/types/chat';
-import { Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import Image from 'next/image'
 import React, { useCallback, useEffect, useState } from 'react'
 
@@ -10,9 +10,11 @@ type Props = {
     chats: ChatRoom[];
     onSelect: (id: string) => void;
     activeId: string;
+    isOpen: boolean;   // 👈 new prop
+    onClose: () => void; // 👈 new prop
 };
 
-const ChatSideBar = ({ chats, onSelect, activeId }: Props) => {
+const ChatSideBar = ({ chats, onSelect, activeId, isOpen, onClose }: Props) => {
     const { socket } = useSocket(); // 👈 use socket
 
     const [search, setSearch] = useState('')
@@ -86,6 +88,9 @@ const ChatSideBar = ({ chats, onSelect, activeId }: Props) => {
         // for messages you saw right before switching)
         socket?.emit("read", { chatroom_id: chatId, user_id: user?._id });
         onSelect(chatId);
+        if (onClose) onClose(); // close sidebar on mobile
+
+
     };
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -153,10 +158,19 @@ const ChatSideBar = ({ chats, onSelect, activeId }: Props) => {
             socket.off("connect"); // Clean up connect listener
         };
     }, [socket, user?._id]);
+
     return (
-        <div className="w-80 flex flex-col h-full bg-white border-r">
+        <div
+            className={`  z-50 h-full transition-transform duration-300 
+            ${isOpen ? "translate-x-0" : "-translate-x-full"} 
+            w-80 flex flex-col bg-white border-r`}
+        >
             <div className='mx-6 space-y-4'>
-                <h3 className='text-xl font-bold text-black mt-2'>Chats</h3>
+                <div className='flex items-center justify-between py-4 px-2 '>
+
+                    <h3 className='text-xl font-bold text-black mt-2'>Chats</h3>
+                    <X className='cursor-pointer mt-2' onClick={onClose} />
+                </div>
                 <div className='relative bg-pink-50 rounded-xl h-12 items-center'>
                     <input type="text" placeholder='Search users...'
                         value={search}

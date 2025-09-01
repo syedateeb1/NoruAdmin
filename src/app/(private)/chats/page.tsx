@@ -5,12 +5,16 @@ import { ChatContainer } from "./_components/chat/ChatContainer";
 import { useEffect, useState } from "react";
 import { ChatRoom } from "@/types/chat";
 import { getChatRooms } from "@/services/chatService";
+import { Menu } from "lucide-react";
+import { ChatBubbleBottomCenterIcon } from "@heroicons/react/20/solid";
 
 
 export default function Home() {
 
   const [selectedChat, setSelectedChat] = useState<ChatRoom | null>(null);
   const [allChats, setAllChats] = useState<ChatRoom[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // 👈 sidebar toggle state
+
   const handleMarkAsRead = (chatId: string) => {
 
     setAllChats((prev) =>
@@ -43,16 +47,44 @@ export default function Home() {
     };
     fetchChats();
   }, []);
+
+
+  const setSideBar = (status: boolean) => {
+    setIsSidebarOpen(status)
+    console.log("🚀 ~ file: page.tsx:68 ~ setSideBar ~ isSidebarOpen:", isSidebarOpen)
+  }
   return (
     <>
       <ProtectedRoute>
-        <div className='flex h-screen'>
+        <div className="flex h-screen relative">
+          {/* Sidebar (mobile toggle handled inside component) */}
           <ChatSideBar
             chats={allChats}
             onSelect={handleSelectChat}
-            activeId={selectedChat?._id ?? ''}
+            activeId={selectedChat?._id ?? ""}
+            isOpen={isSidebarOpen}
+            onClose={() => setSideBar(false)}
           />
-          {selectedChat && <ChatContainer {...selectedChat} onReadChat={handleMarkAsRead} />}
+
+          {/* Mobile top bar */}
+          {!isSidebarOpen && (
+
+            <div className="absolute top-3 left-3 z-50 md:hidden">
+              <button
+                onClick={() => setSideBar(true)}
+                className="p-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+              >
+                <ChatBubbleBottomCenterIcon className="w-6 h-6" />
+              </button>
+            </div>
+          )}
+
+          {/* Chat container */}
+          <div className="flex-1">
+            {selectedChat && (
+              <ChatContainer {...selectedChat} onReadChat={handleMarkAsRead} />
+            )}
+          </div>
         </div>
       </ProtectedRoute>
     </>

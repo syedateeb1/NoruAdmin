@@ -13,52 +13,64 @@ export const TableCellSkeleton = ({ image, name, heading }: { image?: string, na
 
         return (
             <div className="flex flex-col py-2">
-                <h5 className='font-bold '>{heading}</h5>
-                <div className="flex items-center gap-1">
-                    {/* Full stars */}
-                    {Array.from({ length: fullStars }, (_, index) => (
-                        <Star
-                            key={`full-${index}`}
-                            className="w-4 h-4 fill-yellow-dark text-yellow-dark"
-                        />
-                    ))}
-                    {/* Half star */}
-                    {hasHalfStar && (
-                        <div className="relative w-4 h-4">
-                            <Star className="w-4 h-4 text-dark-4" />
-                            <div className="absolute inset-0 overflow-hidden w-[50%]">
-                                <Star className="w-4 h-4 fill-yellow-dark text-yellow-dark" />
+                <h5 className='font-bold px-1'>{heading}</h5>
+                <div className="flex items-center sm:flex-col md:flex-row gap-1">
+                    <div className="flex gap-1">
+                        {/* Full stars */}
+                        {Array.from({ length: fullStars }, (_, index) => (
+                            <Star
+                                key={`full-${index}`}
+                                className="w-4 h-4 fill-yellow-dark text-yellow-dark"
+                            />
+                        ))}
+                        {/* Half star */}
+                        {hasHalfStar && (
+                            <div className="relative w-4 h-4">
+                                <Star className="w-4 h-4 text-dark-4" />
+                                <div className="absolute inset-0 overflow-hidden w-[50%]">
+                                    <Star className="w-4 h-4 fill-yellow-dark text-yellow-dark" />
+                                </div>
                             </div>
-                        </div>
-                    )}
-                    {/* Empty stars */}
-                    {Array.from({ length: emptyStars }, (_, index) => (
-                        <Star
-                            key={`empty-${index}`}
-                            className="w-4 h-4 text-dark-4"
-                        />
-                    ))}
-                    <span className="font-sans text-body-md font-medium text-dark">({name})</span>
+                        )}
+                        {/* Empty stars */}
+                        {Array.from({ length: emptyStars }, (_, index) => (
+                            <Star
+                                key={`empty-${index}`}
+                                className="w-4 h-4 text-dark-4"
+                            />
+                        ))}
+                    </div>
+
+                    <span className="font-sans text-body-md font-medium text-dark ">({name}) </span>
                 </div>
             </div>
         );
     }
     return (
-        <div className="flex gap-2 items-center  overflow-hidden max-w-full">
+        <div className="flex gap-2 items-center overflow-hidden max-w-full  px-[2px]">
             {image && (
                 <OptimizedImage
                     src={image}
                     alt="Avatar"
-                    width={40}   // w-10 = 2.5rem = 40px
-                    height={40}  // h-10 = 2.5rem = 40px
+                    width={40}
+                    height={40}
                     className="w-10 h-10 rounded-full object-cover"
                 />
             )}
-            <div className="flex flex-col py-2 overflow-hidden">
-                <h5 className="font-sans text-heading-7 font-bold text-dark-4 break-words whitespace-normal">{heading}</h5>
-                <p className="font-sans text-body-lg font-medium text-dark break-words whitespace-normal">{name}</p>
+
+            <div
+                className={`flex flex-col py-2 overflow-hidden w-full`}
+            >
+                <h5 className="font-sans text-heading-7 font-bold text-dark-4 truncate ml-1">
+                    {heading}
+                </h5>
+                <p className="font-sans text-body-lg font-medium text-dark break-words whitespace-normal px-1">
+                    {name}
+                </p>
             </div>
         </div>
+
+
 
     )
 }

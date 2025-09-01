@@ -16,7 +16,7 @@ export async function customersList(
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error("Axios error fetching rides:", error.response?.data);
+      console.error("Axios error fetching rides:", error?.response?.data);
       throw new Error(error.response?.data?.message || "Failed to fetch rides");
     }
     console.error("Unexpected error:", error);

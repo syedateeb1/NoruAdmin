@@ -24,6 +24,7 @@ interface ApiUser {
     total_reviews?: number;
     average_rating?: number;
     registration_status?: number;
+    role?: string
     // ... other fields
 }
 
@@ -36,9 +37,11 @@ interface TransformedUser {
     rides: string;
     rating: string;
     status: "active" | "block";
+    role?: string
 }
 
 const transformRideData = (apiResponse: { data?: ApiUser[] }): TransformedUser[] => {
+    // console.log({ apiResponse });
     const users = apiResponse.data || [];
 
     return users.map(user => ({
@@ -51,7 +54,8 @@ const transformRideData = (apiResponse: { data?: ApiUser[] }): TransformedUser[]
         name: user.full_name || `${user.first_name} ${user.last_name}`,
         rides: user.total_reviews?.toString() || "0",
         rating: user.average_rating?.toFixed(1)?.toString() || "0",
-        status: user.registration_status === 4 ? "active" : "block"
+        status: user.registration_status === 4 ? "active" : "block",
+        role: user.role
     }));
 };
 const ITEMS_PER_PAGE = 4;
@@ -75,23 +79,12 @@ export const CustomersList = () => {
                 loadCustomers(searchQuery);
                 break;
         }
-        // if (status) {
-        //     const updatedData = filteredData.map((item) => {
-        //         if (item._id === id) {
-        //             return { ...item, status: status };
-        //         }
-        //         return item;
-        //     });
-        //     setFilteredData(updatedData);
-        //     setDisplayedData((prev) =>
-        //         prev.map((item) => (item._id === id ? { ...item, status } : item))
-        //     );
-        // }
+
     };
     const loadCustomers = async (searchQuery: string) => {
         try {
             const response: any = await customersList(searchQuery);
-            console.log('API Response:', response); // Debugging
+            // console.log('API Response:', response); // Debugging
 
             // Handle different response formats
             const result = Array.isArray(response) ? response :
@@ -131,26 +124,14 @@ export const CustomersList = () => {
             setCurrentPage(1);
             setHasMore(filtered.length > ITEMS_PER_PAGE);
             loadCustomers(searchQuery);
-            // Real API call example (uncomment and replace with your endpoint)
-            /*
-            async function fetchData() {
-              try {
-                const response = await fetch(`/api/rides?search=${encodeURIComponent(searchQuery)}`);
-                const data = await response.json();
-                setFilteredData(data);
-              } catch (error) {
-                console.error('Error fetching data:', error);
-              }
-            }
-            fetchData();
-            */
+
         }, 300); // Debounce for 300ms
 
         return () => clearTimeout(delayDebounceFn);
     }, [searchQuery]);
     useEffect(() => {
         if (!observerRef.current || !hasMore || searchQuery) return
-        console.log("observerRef.current", observerRef.current);
+        // console.log("observerRef.current", observerRef.current);
         const obersver = new IntersectionObserver((entries) => {
             const first = entries[0];
             if (first.isIntersecting) {
@@ -182,21 +163,23 @@ export const CustomersList = () => {
             <div className={scrollDiv}>
                 {customers.map((item, index) => {
                     return (
-                        <div key={index} className="">
-                            <div className="min-w-[1200px] ">
-                                <RidesDetail
-                                    key={index}
-                                    _id={item._id}
-                                    innerData={item}
-                                    status={item.status}
-                                    option={true} // Matches usage: option="asd"
-                                    options={options}
-                                    onClick={onClickHandle}
-                                />
+                        item.role !== 1 && ( // 👈 check role here
+                            <div key={index}>
+                                <div className="min-w-[1200px]">
+                                    <RidesDetail
+                                        _id={item._id}
+                                        innerData={item}
+                                        status={item.status}
+                                        option={true}
+                                        options={options}
+                                        onClick={onClickHandle}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    )
+                        )
+                    );
                 })}
+
                 {/* 🧲 Infinite Scroll Trigger */}
                 {!searchQuery && hasMore && (
                     <div ref={observerRef} className="w-full h-12 flex justify-center items-center">

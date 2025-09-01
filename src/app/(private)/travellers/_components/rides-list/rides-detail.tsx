@@ -169,20 +169,18 @@ export const RidesDetail = (props: PropType) => {
 
                 <TableCellSkeleton heading={"Jobs"} name={props.innerData.jobs} />
             </div>
-            <div className=" flex items-center justify-start">
 
-                <TableCellSkeleton heading={"Rides"} name={props.innerData.rides} />
+            {/* Rating + Status (side by side, always) */}
+            <div className="col-span-2 sm:col-span-3 flex items-center justify-evenly">
+                <TableCellSkeleton heading="Rating" name={props.innerData.rating} />
+                <StatusBadge status={props.status ? "blocked" : "active"} type="badge" />
             </div>
-            <div className=" flex items-center justify-start">
+            {/* <div className=" flex items-center justify-end">
 
-                <TableCellSkeleton heading={"Rating"} name={props.innerData.rating} />
-            </div>
-            <div className=" flex items-center justify-end">
-
-                <StatusBadge status={props.status ? "blocked" : "active"} />
+                <StatusBadge status={props.status ? "blocked" : "active"} type='badge' />
 
 
-            </div>
+            </div> */}
             {props.option && (
                 <div className=" flex items-center justify-end">
                     <button ref={buttonRef} onClick={handleIconClick} aria-label="More options">

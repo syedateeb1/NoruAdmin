@@ -160,7 +160,7 @@ export const RidesDetail = (props: PropType) => {
                 <TableCellSkeleton heading="Income" name={props.innerData.income} />
             </div>
             <div className="flex items-center justify-end">
-                <StatusBadge status={props.status ? "blocked" : "active"} />
+                <StatusBadge status={props.status ? "blocked" : "active"} type='badge' />
             </div>
 
             {props.option && (

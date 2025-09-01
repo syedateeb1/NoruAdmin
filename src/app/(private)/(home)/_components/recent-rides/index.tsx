@@ -231,17 +231,22 @@ export const RecentRides = () => {
                 className={scrollDiv}
 
             >
+
                 {rides.length > 0 ? (
                     rides.map((item, index) => (
-                        <RidesDetail
-                            key={index}
-                            _id={item._id}
-                            innerData={item.details}
-                            status={item.status}
-                            option={false}
-                            options={options}
-                            onClick={onClickHandle}
-                        />
+                        <div key={index} className="">
+                            <div className="min-w-[1200px] ">
+                                <RidesDetail
+                                    key={index}
+                                    _id={item._id}
+                                    innerData={item.details}
+                                    status={item.status}
+                                    option={false}
+                                    options={options}
+                                    onClick={onClickHandle}
+                                />
+                            </div>
+                        </div>
                     ))
                 ) : (
                     <div className="flex items-center justify-center h-full">
