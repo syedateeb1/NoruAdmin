@@ -22,6 +22,8 @@ interface ApiUser {
     phone_number: string;
     profile_image?: string;
     total_reviews?: number;
+    approved?: boolean;
+    is_online?: boolean;
     average_rating?: number;
     registration_status?: number;
     role?: string
@@ -42,6 +44,15 @@ interface TransformedUser {
 
 const transformRideData = (apiResponse: { data?: ApiUser[] }): TransformedUser[] => {
     // console.log({ apiResponse });
+    if (!apiResponse.data) {
+        // console.warn('transformRideData: apiResponse.dat parameter is null or undefined');
+        return [];
+    }
+    // Handle non-array input
+    if (!Array.isArray(apiResponse.data)) {
+        // console.error('transformRideData: Expected array but received', typeof rides);
+        return [];
+    }
     const users = apiResponse.data || [];
 
     return users.map(user => ({
@@ -55,6 +66,8 @@ const transformRideData = (apiResponse: { data?: ApiUser[] }): TransformedUser[]
         rides: user.total_reviews?.toString() || "0",
         rating: user.average_rating?.toFixed(1)?.toString() || "0",
         status: user.registration_status === 4 ? "active" : "block",
+        blocked: user.approved ? "active" : "block",
+        is_online: user.is_online ? "active" : "block",
         role: user.role
     }));
 };

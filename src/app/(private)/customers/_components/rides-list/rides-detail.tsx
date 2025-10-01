@@ -33,6 +33,8 @@ interface propDataType {
     drivers: string,
     vehicles: string,
     role?: string,
+    blocked?: boolean,
+    is_online?: boolean,
     jobs: string
 }
 
@@ -158,53 +160,66 @@ export const RidesDetail = (props: PropType) => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [isMenuOpen]);
     return (
-        <div className="grid grid-cols-9  w-full bg-white py-2 px-4 rounded-2xl relative min-h-[60px]">
-            <div className=" flex col-span-2 items-center justify-start">
+        <div
+            className="grid w-full bg-white py-2 px-4 rounded-2xl relative min-h-[60px] gap-3"
+            style={{
+                gridTemplateColumns: "2fr 2fr 1fr 1fr 1fr 1fr 1fr 1fr auto",
+                // 👆 Adjust these fractions as per required spacing
+            }}
+        >
+            {/* Name */}
+            <div className="flex items-center justify-start">
                 <TableCellSkeleton image={props.innerData.image} heading={"Name"} name={props.innerData.name} />
             </div>
-            <div className=" flex col-span-2 items-center justify-start">
+
+            {/* Email */}
+            <div className="flex items-center justify-start">
                 <TableCellSkeleton heading={"Email"} name={props.innerData.email} />
             </div>
-            <div className=" flex items-center justify-start">
 
+            {/* Phone */}
+            <div className="flex items-center justify-start">
                 <TableCellSkeleton heading={"Phone"} name={props.innerData.phone} />
             </div>
 
-            <div className=" flex items-center justify-start">
-
+            {/* Rides */}
+            <div className="flex items-center justify-start">
                 <TableCellSkeleton heading={"Rides"} name={props.innerData.rides} />
             </div>
-            <div className=" flex items-center justify-start">
 
+            {/* Rating */}
+            <div className="flex items-center justify-start">
                 <TableCellSkeleton heading={"Rating"} name={props.innerData.rating} />
             </div>
-            <div className=" flex items-center justify-end">
 
-                <StatusBadge status={props.status === "block" ? "blocked" : "active"} type='badge' />
-
+            {/* Approval Status */}
+            <div className="flex items-center justify-end">
+                <StatusBadge
+                    status={props.innerData.blocked ? "active" : "blocked"}
+                    type="badge"
+                    name="Approval Status"
+                />
             </div>
-            {props.option && (
-                <div className=" flex items-center justify-end">
 
+            {/* Current Mode */}
+            <div className="flex items-center justify-end">
+                <StatusBadge
+                    status={props.innerData.is_online ? "online" : "offline"}
+                    type="badge"
+                    name="Current Mode"
+                />
+            </div>
+
+            {/* Options */}
+            {props.option && (
+                <div className="flex items-center justify-end">
                     <button ref={buttonRef} onClick={handleIconClick} aria-label="More options">
                         <EllipsisVertical className="w-5 h-5 text-dark-4 hover:text-primary cursor-pointer" />
                     </button>
-
                 </div>
             )}
-            {/* {isMenuOpen && props.options && (
-                <div ref={menuRef} className="absolute right-4 top-12 bg-white shadow-lg rounded-lg p-2 z-10 flex-1">
-                    {props.options.map((option, index) => (
-                        <button
-                            key={index}
-                            onClick={() => handleOptionClick(option.id, props._id, props.status == "block" ? "active" : "block")}
-                            className="block w-full text-left px-4 py-2 text-body-sm font-sans font-medium text-dark-4 hover:bg-gray-1 rounded"
-                        >
-                            {option.label === "Traveller" ? props.status == "block" ? "Unblock" : "Block" : ""}   {option.label}
-                        </button>
-                    ))}
-                </div>
-            )} */}
+
+            {/* Dropdown Portal */}
             {isMenuOpen && props.options &&
                 createPortal(
                     <div
@@ -215,16 +230,23 @@ export const RidesDetail = (props: PropType) => {
                         {props.options.map((option, index) => (
                             <button
                                 key={index}
-                                onClick={() => handleOptionClick(option.id, props._id, props.status == "block" ? "active" : "block", props.innerData?.role)}
+                                onClick={() =>
+                                    handleOptionClick(option.id, props._id, props.status == "block" ? "active" : "block", props.innerData?.role)
+                                }
                                 className="block w-full text-left px-4 py-2 text-body-sm font-sans font-medium text-dark-4 hover:bg-gray-1 rounded"
                             >
-                                {option.label === "Traveller" ? props.status == "block" ? "Unblock" : "Block" : ""}   {option.label}
+                                {option.label === "Traveller"
+                                    ? props.status == "block"
+                                        ? "Unblock"
+                                        : "Block"
+                                    : ""}{" "}
+                                {option.label}
                             </button>
                         ))}
                     </div>,
                     document.body
                 )}
-
         </div>
+
     );
 };

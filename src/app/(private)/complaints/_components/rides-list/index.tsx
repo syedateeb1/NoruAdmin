@@ -7,7 +7,6 @@ import { inputCss } from "@/utils/constants";
 import SearchInput from "@/components/SearchComponent";
 import { complaintList, updateComplaint } from "@/services/complaintService";
 import Swal from "sweetalert2";
-const image = "https://media.istockphoto.com/id/1809645289/photo/sports-car-driving-at-on-a-road-on-high-speed-racing-through-the-colorful-dark-tunnel-with.webp?a=1&b=1&s=612x612&w=0&k=20&c=LxcEDz82h45rRZWmdIUqMSSQGHdoKWbm_NAmvSei_hU=";
 
 const options = [
     { id: 'delete', label: 'Delete Traveller' },
@@ -17,6 +16,15 @@ const options = [
 const ITEMS_PER_PAGE = 4;
 
 const transformRideData = (apiResponse: { data?: any[] }): any[] => {
+    if (!apiResponse.data) {
+        // console.warn('transformRideData: apiResponse.dat parameter is null or undefined');
+        return [];
+    }
+    // Handle non-array input
+    if (!Array.isArray(apiResponse.data)) {
+        // console.error('transformRideData: Expected array but received', typeof rides);
+        return [];
+    }
     const users = apiResponse.data || [];
     return users.map(user => ({
         _id: user._id,
@@ -28,6 +36,7 @@ const transformRideData = (apiResponse: { data?: any[] }): any[] => {
         complaint_from: user?.complainer_id,
     }));
 };
+
 export const RidesList = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredData, setFilteredData] = useState(data.data);

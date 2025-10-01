@@ -18,6 +18,15 @@ const options = [
 
 
 const transformRideData = (apiResponse: { data?: any[] }): any[] => {
+    if (!apiResponse.data) {
+        // console.warn('transformRideData: apiResponse.dat parameter is null or undefined');
+        return [];
+    }
+    // Handle non-array input
+    if (!Array.isArray(apiResponse.data)) {
+        // console.error('transformRideData: Expected array but received', typeof rides);
+        return [];
+    }
     const users = apiResponse.data || [];
     console.log(users, "fetchRides")
     return users.map(user => ({

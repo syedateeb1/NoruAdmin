@@ -17,6 +17,15 @@ const pCss = "flex items-center gap-2"
 const ITEMS_PER_PAGE = 8;
 
 const transformRideData = (apiResponse: { data?: any[] }): any[] => {
+    if (!apiResponse.data) {
+        // console.warn('transformRideData: apiResponse.dat parameter is null or undefined');
+        return [];
+    }
+    // Handle non-array input
+    if (!Array.isArray(apiResponse.data)) {
+        // console.error('transformRideData: Expected array but received', typeof rides);
+        return [];
+    }
     const users = apiResponse.data || [];
     return users.map(user => ({
         _id: user._id,

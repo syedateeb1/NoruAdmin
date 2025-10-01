@@ -81,6 +81,15 @@ interface TransformedRide {
 }
 
 const transformRideData = (rides: ApiRide[]): TransformedRide[] => {
+    if (!rides) {
+        // console.warn('transformRideData: rides parameter is null or undefined');
+        return [];
+    }
+    // Handle non-array input
+    if (!Array.isArray(rides)) {
+        // console.error('transformRideData: Expected array but received', typeof rides);
+        return [];
+    }
     return rides.map(ride => ({
         details: [
             {

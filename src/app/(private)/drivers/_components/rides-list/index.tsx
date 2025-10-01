@@ -19,6 +19,15 @@ const options = [
 
 
 const transformRideData = (apiResponse: { data?: any[] }): any[] => {
+    if (!apiResponse.data) {
+        // console.warn('transformRideData: apiResponse.dat parameter is null or undefined');
+        return [];
+    }
+    // Handle non-array input
+    if (!Array.isArray(apiResponse.data)) {
+        // console.error('transformRideData: Expected array but received', typeof rides);
+        return [];
+    }
     const users = apiResponse.data || [];
     return users.map(user => ({
         _id: user._id,
@@ -32,7 +41,8 @@ const transformRideData = (apiResponse: { data?: any[] }): any[] => {
         name: user.full_name || `${user.first_name} ${user.last_name}`,
         rides: user.total_reviews?.toString() || "0",
         rating: user.average_rating?.toFixed(1)?.toString() || "0",
-        status: user.blocked,
+        blocked: user.approved,
+        is_online: user.is_online,
         approved: user.approved,
         income: user.wallet.balance || 0,
         driver_info: user.driver_info,

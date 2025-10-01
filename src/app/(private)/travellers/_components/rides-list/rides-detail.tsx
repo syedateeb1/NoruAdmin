@@ -31,6 +31,7 @@ interface propDataType {
     status: string,
     drivers: string,
     vehicles: string,
+    is_online: boolean,
     jobs: string
 }
 
@@ -146,62 +147,70 @@ export const RidesDetail = (props: PropType) => {
     }, [isMenuOpen]);
     { console.log({ props }) }
     return (
-        <div className="grid grid-cols-12  w-full bg-white py-2 px-4 rounded-2xl relative min-h-[60px]">
-            <div className=" flex col-span-2 items-center justify-start">
-                <TableCellSkeleton image={props.innerData.image} heading={"Name"} name={props.innerData.name} />
-            </div>
-            <div className=" flex col-span-2 items-center justify-start">
-                <TableCellSkeleton heading={"Email"} name={props.innerData.email} />
-            </div>
-            <div className=" flex items-center justify-start">
-
-                <TableCellSkeleton heading={"Phone"} name={props.innerData.phone} />
-            </div>
-            <div className=" flex items-center justify-start">
-
-                <TableCellSkeleton heading={"Drivers"} name={props.innerData.drivers} />
-            </div>
-            <div className=" flex items-center justify-start">
-
-                <TableCellSkeleton heading={"Vehicles"} name={props.innerData.vehicles} />
-            </div>
-            <div className=" flex items-center justify-start">
-
-                <TableCellSkeleton heading={"Jobs"} name={props.innerData.jobs} />
-            </div>
-
-            {/* Rating + Status (side by side, always) */}
-            <div className="col-span-2 sm:col-span-3 flex items-center justify-evenly">
-                <TableCellSkeleton heading="Rating" name={props.innerData.rating} />
-                <StatusBadge status={props.status ? "blocked" : "active"} type="badge" />
-            </div>
-            {/* <div className=" flex items-center justify-end">
-
-                <StatusBadge status={props.status ? "blocked" : "active"} type='badge' />
-
-
-            </div> */}
-            {props.option && (
-                <div className=" flex items-center justify-end">
-                    <button ref={buttonRef} onClick={handleIconClick} aria-label="More options">
-                        <EllipsisVertical className="w-5 h-5 text-dark-4 hover:text-primary cursor-pointer" />
-                    </button>
-
+        <div className="w-full bg-white py-2 px-4 rounded-2xl relative min-h-[60px] overflow-x-auto">
+            <div
+                className="grid items-center gap-4 min-w-max"
+                style={{
+                    gridTemplateColumns:
+                        "180px 220px 160px 120px 120px 120px 160px 160px 140px auto",
+                }}
+            >
+                {/* Name */}
+                <div className="flex items-center">
+                    <TableCellSkeleton image={props.innerData.image} heading="Name" name={props.innerData.name} />
                 </div>
-            )}
-            {/* {isMenuOpen && props.options && (
-                <div ref={menuRef} className="absolute right-4 top-12 bg-white shadow-lg rounded-lg p-2 z-10 flex-1">
-                    {props.options.map((option, index) => (
-                        <button
-                            key={index}
-                            onClick={() => handleOptionClick(option.id, props._id, !props.status ? "active" : "block")}
-                            className="block w-full text-left px-4 py-2 text-body-sm font-sans font-medium text-dark-4 hover:bg-gray-1 rounded"
-                        >
-                            {option.label === "Traveller" ? props.status == "block" ? "Unblock" : "Block" : ""}   {option.label}
+
+                {/* Email */}
+                <div className="flex items-center">
+                    <TableCellSkeleton heading="Email" name={props.innerData.email} />
+                </div>
+
+                {/* Phone */}
+                <div className="flex items-center">
+                    <TableCellSkeleton heading="Phone" name={props.innerData.phone} />
+                </div>
+
+                {/* Drivers */}
+                <div className="flex items-center">
+                    <TableCellSkeleton heading="Drivers" name={props.innerData.drivers} />
+                </div>
+
+                {/* Vehicles */}
+                <div className="flex items-center">
+                    <TableCellSkeleton heading="Vehicles" name={props.innerData.vehicles} />
+                </div>
+
+                {/* Jobs */}
+                <div className="flex items-center">
+                    <TableCellSkeleton heading="Jobs" name={props.innerData.jobs} />
+                </div>
+
+                {/* Rating */}
+                <div className="flex items-center">
+                    <TableCellSkeleton heading="Rating" name={props.innerData.rating} />
+                </div>
+
+                {/* Approval Status */}
+                <div className="flex items-center justify-center">
+                    <StatusBadge status={!props.status ? "blocked" : "active"} type="badge" name="Approval Status" />
+                </div>
+
+                {/* Current Mode */}
+                <div className="flex items-center justify-center">
+                    <StatusBadge status={props.innerData.is_online ? "online" : "offline"} type="badge" name="Current Mode" />
+                </div>
+
+                {/* Ellipsis */}
+                {props.option && (
+                    <div className="flex items-center justify-end">
+                        <button ref={buttonRef} onClick={handleIconClick} aria-label="More options">
+                            <EllipsisVertical className="w-5 h-5 text-dark-4 hover:text-primary cursor-pointer" />
                         </button>
-                    ))}
-                </div>
-            )} */}
+                    </div>
+                )}
+            </div>
+
+            {/* Options Menu */}
             {isMenuOpen && props.options &&
                 createPortal(
                     <div
@@ -215,52 +224,14 @@ export const RidesDetail = (props: PropType) => {
                                 onClick={() => handleOptionClick(option.id, props._id, !props.status ? "active" : "block")}
                                 className="block w-full text-left px-4 py-2 text-body-sm font-sans font-medium text-dark-4 hover:bg-gray-1 rounded"
                             >
-                                {option.label === "Traveller" ? props.status ? "Unblock" : "Block" : ""}   {option.label}
+                                {option.label === "Traveller" ? props.status ? "Unblock" : "Block" : ""} {option.label}
                             </button>
                         ))}
                     </div>,
                     document.body
                 )}
-            {/* {props.innerData.map((item, index) => (
-                    <div key={index} className={`flex-1 flex items-end justify-start`}>
-                        <RidesDetailSkeleton image={item.image} heading={item.heading} name={item.name} />
-                    </div>
-                ))}
-                <div className="flex  items-end justify-center gap-2 flex-1  ">
-                    <div
-                        className={`inline-block px-3 py-1 rounded-full ${props.status === 'completed'
-                            ? 'bg-green-200 text-green-700'
-                            : props.status === 'inprogress'
-                                ? 'bg-yellow-200 text-yellow-700'
-                                : 'bg-red-200 text-red-700'
-                            }`}
-                    >
-                        <p className="font-sans text-caption font-semibold">{props.status}</p>
-                    </div>
-
-                </div>
-                {props.option && (<div className="flex items-end justify-center ga  -2 flex-1">
-
-
-                    <button onClick={handleIconClick} aria-label="More options">
-                        <EllipsisVertical className="w-5 h-5 text-dark-4 hover:text-primary cursor-pointer" />
-                    </button>
-
-                </div>
-                )}
-                {isMenuOpen && props.options && (
-                    <div className="absolute right-4 top-12 bg-white shadow-lg rounded-lg p-2 z-10 flex-1">
-                        {props.options.map((option, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handleOptionClick(option.id, props._id)}
-                                className="block w-full text-left px-4 py-2 text-body-sm font-sans font-medium text-dark-4 hover:bg-gray-1 rounded"
-                            >
-                                {option.label}
-                            </button>
-                        ))}
-                    </div>
-                )} */}
         </div>
+
+
     );
 };

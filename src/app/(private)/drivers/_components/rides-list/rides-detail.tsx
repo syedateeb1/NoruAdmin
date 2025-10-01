@@ -25,6 +25,8 @@ interface propDataType {
     rides: string;
     rating: string;
     status: string;
+    blocked: boolean;
+    is_online: boolean;
     drivers: string;
     vehicles: string;
     income: string;
@@ -40,7 +42,7 @@ export const RidesDetail = (props: PropType) => {
     const scrollParentsRef = useRef<(Element | Window)[]>([]);
 
     const handleIconClick = () => setIsMenuOpen((p) => !p);
-
+    console.log({ props })
     const handleOptionClick = (name: string, id: string, status?: string) => {
         props.onClick?.(id, name, status);
         setIsMenuOpen(false);
@@ -140,37 +142,73 @@ export const RidesDetail = (props: PropType) => {
     }, [isMenuOpen]);
 
     return (
-        <div className="grid grid-cols-10 w-full bg-white py-2 px-4 rounded-2xl min-h-[60px]">
-            <div className="flex col-span-2 items-center justify-start">
-                <TableCellSkeleton image={props.innerData.image} heading="Name" name={props.innerData.name} />
-            </div>
-            <div className="flex col-span-2 items-center justify-start">
-                <TableCellSkeleton heading="Email" name={props.innerData.email} />
-            </div>
-            <div className="flex items-center justify-start">
-                <TableCellSkeleton heading="Phone" name={props.innerData.phone} />
-            </div>
-            <div className="flex items-center justify-start">
-                <TableCellSkeleton heading="Rides" name={props.innerData.rides} />
-            </div>
-            <div className="flex items-center justify-start">
-                <TableCellSkeleton heading="Rating" name={props.innerData.rating} />
-            </div>
-            <div className="flex items-center justify-center">
-                <TableCellSkeleton heading="Income" name={props.innerData.income} />
-            </div>
-            <div className="flex items-center justify-end">
-                <StatusBadge status={props.status ? "blocked" : "active"} type='badge' />
-            </div>
-
-            {props.option && (
-                <div className="flex items-center justify-end">
-                    <button ref={buttonRef} onClick={handleIconClick} aria-label="More options">
-                        <EllipsisVertical className="w-5 h-5 text-dark-4 hover:text-primary cursor-pointer" />
-                    </button>
+        <div className="w-full bg-white py-2 px-4 rounded-2xl min-h-[60px] overflow-x-auto">
+            <div
+                className="grid items-center gap-4 min-w-max"
+                style={{
+                    gridTemplateColumns:
+                        "180px 220px 160px 140px 120px 140px 160px 160px auto",
+                }}
+            >
+                {/* Name */}
+                <div className="flex items-center">
+                    <TableCellSkeleton image={props.innerData.image} heading="Name" name={props.innerData.name} />
                 </div>
-            )}
 
+                {/* Email */}
+                <div className="flex items-center">
+                    <TableCellSkeleton heading="Email" name={props.innerData.email} />
+                </div>
+
+                {/* Phone */}
+                <div className="flex items-center">
+                    <TableCellSkeleton heading="Phone" name={props.innerData.phone} />
+                </div>
+
+                {/* Rides */}
+                <div className="flex items-center">
+                    <TableCellSkeleton heading="Rides" name={props.innerData.rides} />
+                </div>
+
+                {/* Rating */}
+                <div className="flex items-center">
+                    <TableCellSkeleton heading="Rating" name={props.innerData.rating} />
+                </div>
+
+                {/* Income */}
+                <div className="flex items-center justify-center">
+                    <TableCellSkeleton heading="Income" name={props.innerData.income} />
+                </div>
+
+                {/* Approval Status */}
+                <div className="flex items-center justify-center">
+                    <StatusBadge
+                        status={!props.innerData.blocked ? "blocked" : "active"}
+                        type="badge"
+                        name="Approval Status"
+                    />
+                </div>
+
+                {/* Current Mode */}
+                <div className="flex items-center justify-center">
+                    <StatusBadge
+                        status={props.innerData.is_online ? "active" : "offline"}
+                        type="badge"
+                        name="Current Mode"
+                    />
+                </div>
+
+                {/* Options Button */}
+                {props.option && (
+                    <div className="flex items-center justify-end">
+                        <button ref={buttonRef} onClick={handleIconClick} aria-label="More options">
+                            <EllipsisVertical className="w-5 h-5 text-dark-4 hover:text-primary cursor-pointer" />
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            {/* Options Menu */}
             {isMenuOpen && props.options &&
                 createPortal(
                     <div
@@ -197,5 +235,6 @@ export const RidesDetail = (props: PropType) => {
                     document.body
                 )}
         </div>
+
     );
 };

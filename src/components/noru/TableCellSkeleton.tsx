@@ -64,7 +64,7 @@ export const TableCellSkeleton = ({ image, name, heading }: { image?: string, na
                 <h5 className="font-sans text-heading-7 font-bold text-dark-4 truncate ml-1">
                     {heading}
                 </h5>
-                <p className="font-sans text-body-lg font-medium text-dark break-words whitespace-normal px-1">
+                <p className="font-sans text-body-lg text-start font-medium text-dark break-words whitespace-normal px-1">
                     {name}
                 </p>
             </div>
