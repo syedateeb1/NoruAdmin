@@ -14,7 +14,7 @@ export default async function Home({ searchParams }: PropsType) {
     <>
       <ProtectedRoute>
         <div className='mt-10  mx-10'>
-          <DriversList />
+          <DriversList /> 
         </div>
       </ProtectedRoute>
     </>

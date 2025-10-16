@@ -1,13 +1,13 @@
-"use client"; // add this at the top
+"use client";
 
 import Image from "next/image";
 import { useState } from "react";
 
 type OptimizedImageProps = {
-    src: string;
+    src?: string;
     alt: string;
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
     className?: string;
     fallback?: string;
 };
@@ -15,24 +15,22 @@ type OptimizedImageProps = {
 const OptimizedImage = ({
     src,
     alt,
-    width,
-    height,
+    width = 100,
+    height = 100,
     className = "",
-    fallback = "/fallback.png",
+    fallback = "/images/icon/user.png",
 }: OptimizedImageProps) => {
     const [imgSrc, setImgSrc] = useState(src || fallback);
 
     return (
         <Image
-            src={imgSrc}
+            src={imgSrc || fallback}
             alt={alt}
             width={width}
             height={height}
-            className={className}
+            className={`object-cover rounded-full border shadow-md ${className}`}
             onError={() => setImgSrc(fallback)}
-            unoptimized={true}
-
-
+            unoptimized
         />
     );
 };

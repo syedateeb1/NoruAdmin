@@ -4,6 +4,7 @@ import { RidesDetail } from "./rides-detail"
 import { useCallback, useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import { scrollDiv } from "@/utils/constants";
+import { ViewRideModal } from "./_components/modal/ViewRideModal";
 const innerData = [
     {
         details: [
@@ -48,8 +49,8 @@ const innerData = [
 ];
 const options = [
     { id: 'view', label: 'View' },
-    { id: 'edit', label: 'Edit' },
-    { id: 'cancel', label: 'Cancel' },
+    // { id: 'edit', label: 'Edit' },
+    // { id: 'cancel', label: 'Cancel' },
 ]
 interface Location {
     address: string;
@@ -113,8 +114,10 @@ export const RecentRides = () => {
     const [hasMore, setHasMore] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [selectedride, setSelectedRide] = useState<any>(null);
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
-
+    const [rideOriginal, setrRidesOriginal] = useState<any[]>([]);
     const loadRides = useCallback(
         async (query: string, page = 1) => {
             setLoading(true);
@@ -126,7 +129,7 @@ export const RecentRides = () => {
                     : response.data
                         ? response.data
                         : [];
-
+                setrRidesOriginal(result);
                 const transformed = transformRideData(result);
 
                 // HasMore logic
@@ -199,7 +202,14 @@ export const RecentRides = () => {
                     cancelButtonColor: "#3085d6",
                     confirmButtonText: "Yes, delete it!",
                 });
+            case "view":
 
+                const rideData = rideOriginal.find(ride => ride._id === id);
+                if (rideData) {
+                    setSelectedRide(rideData);
+                    setIsViewModalOpen(true);
+                }
+                break;
                 // if (confirmDelete.isConfirmed) {
                 //     await deleteCustomer(id);
                 //     Swal.fire({
@@ -244,13 +254,13 @@ export const RecentRides = () => {
                 {rides.length > 0 ? (
                     rides.map((item, index) => (
                         <div key={index} className="">
-                            <div className="min-w-[1200px] ">
+                            <div className="min-w-[800px] ">
                                 <RidesDetail
                                     key={index}
                                     _id={item._id}
                                     innerData={item.details}
                                     status={item.status}
-                                    option={false}
+                                    option={true}
                                     options={options}
                                     onClick={onClickHandle}
                                 />
@@ -261,6 +271,14 @@ export const RecentRides = () => {
                     <div className="flex items-center justify-center h-full">
                         <p className="text-gray-500">No rides found</p>
                     </div>
+                )}
+                {isViewModalOpen && (
+                    <ViewRideModal
+                        isOpen={isViewModalOpen}
+                        onClose={() => setIsViewModalOpen(false)}
+                        ride={selectedride}
+                    // onClickHandle={onClickHandle}
+                    />
                 )}
             </div>
         </div>
