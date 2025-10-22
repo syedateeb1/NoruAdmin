@@ -1,3 +1,4 @@
+import { Settings } from "lucide-react";
 import * as Icons from "../icons";
 
 export const NAV_DATA = [
@@ -48,9 +49,9 @@ export const NAV_DATA = [
         items: [],
       },
       {
-        title: "Rides",
-        url: "/rides",
-        icon: Icons.SharpDirectionsCarFilled,
+        title: "Settings",
+        url: "/settings",
+        icon: Settings, // ✅ Lucide-react icon
         items: [],
       },
 
@@ -88,16 +89,6 @@ export const NAV_DATA = [
       //     {
       //       title: "Tables",
       //       url: "/tables",
-      //     },
-      //   ],
-      // },
-      // {
-      //   title: "Pages",
-      //   icon: Icons.Alphabet,
-      //   items: [
-      //     {
-      //       title: "Settings",
-      //       url: "/pages/settings",
       //     },
       //   ],
       // },
