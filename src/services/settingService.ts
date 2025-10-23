@@ -1,5 +1,9 @@
 // src/services/settingsService.ts
-import { radiusSetUrl, settingUrl } from "@/data/constants/apiRoutes";
+import {
+  radiusGetUrl,
+  radiusSetUrl,
+  settingUrl,
+} from "@/data/constants/apiRoutes";
 import axiosClient from "@/lib/axiosClient";
 import axios from "axios";
 
@@ -46,7 +50,7 @@ export async function setRadiusService(radius?: {
       response = await axiosClient.patch(radiusSetUrl, radius);
     } else {
       // ✅ Get settings (GET)
-      response = await axiosClient.get(settingUrl);
+      response = await axiosClient.get(radiusGetUrl);
     }
 
     return response.data;

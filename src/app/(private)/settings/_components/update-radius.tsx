@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 
 export function UpdateRadiusForm() {
     const [radius, setRadius] = useState<string>("0.0");
-
+    const [loading, setLoading] = useState(true);
 
 
     // ✅ Handle save
@@ -35,6 +35,27 @@ export function UpdateRadiusForm() {
             toast.error("Error setting Radius");
         }
     };
+
+    // ✅ Load existing profile on component mount
+    const loadRadius = async () => {
+        try {
+            const res = await setRadiusService();
+            console.log(res?.data, "radius")
+            if (res?.data) {
+                setRadius(res.data.immediate_ride_radius || "");
+
+            }
+        } catch (err) {
+            console.error("Error loading profile:", err);
+            toast.error("Failed to load profile");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadRadius();
+    }, []);
 
 
 

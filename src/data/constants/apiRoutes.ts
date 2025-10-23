@@ -10,3 +10,4 @@ export const complaintUrl = "/complaints";
 export const overviewDashboardUrl = "/admin/overview";
 export const settingUrl = "/cover-photos";
 export const radiusSetUrl = "/admin/ride-settings/radius";
+export const radiusGetUrl = "/admin/ride-settings";
