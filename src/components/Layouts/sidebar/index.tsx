@@ -75,8 +75,8 @@ export function Sidebar() {
             >
               {/* Always show logo */}
               <Image
-                src="/logo.png"
-                alt="Logo"
+                src="/logo.svg"
+                alt="Noru Logo"
                 width={40}
                 height={40}
                 className="rounded-md"
