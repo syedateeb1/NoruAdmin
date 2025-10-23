@@ -16,19 +16,23 @@ export function UpdateRadiusForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log({ radius });
+        if (parseInt(radius) < 1) {
+            toast.error("Radius must be 1 or greater");
+            return;
+        }
 
         try {
             const res = await setRadiusService({ radius });
             // const res = { success: true, data: { radius: "0.0", photo: "/users/placeholder.png" } };
             if (res?.status === 200) {
-                toast.success("Radius updated successfully!");
+                toast.success("Radius set successfully!");
 
             } else {
-                toast.error("Failed to update profile");
+                toast.error("Failed to set Radius");
             }
         } catch (err) {
             console.error("Update failed:", err);
-            toast.error("Error saving profile");
+            toast.error("Error setting Radius");
         }
     };
 
@@ -50,6 +54,8 @@ export function UpdateRadiusForm() {
                         // icon={<UserIcon />}
                         iconPosition="left"
                         height="sm"
+                        min={1} // ✅ minimum value 1
+
                     />
 
                 </div>

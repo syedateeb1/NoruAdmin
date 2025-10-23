@@ -25,7 +25,7 @@ export function UpdateSettingForm() {
       if (res?.data) {
         setTitle(res.data.title || "");
         setDescription(res.data.description || "");
-        setPhotoPreview("/" + res.data.image_url || "/users/placeholder.png");
+        setPhotoPreview(res.data.image_url || "/users/placeholder.png");
       }
     } catch (err) {
       console.error("Error loading profile:", err);
@@ -70,8 +70,8 @@ export function UpdateSettingForm() {
     try {
       const res = await settings(formData);
       // const res = { success: true, data: { radius: "0.0", photo: "/users/placeholder.png" } };
-      if (res?.success) {
-        toast.success("Setting updated successfully!");
+      if (res?.status === 200) {
+        toast.success(res?.message || "Setting updated successfully!");
         loadProfile();
       } else {
         toast.error("Failed to update setting");
