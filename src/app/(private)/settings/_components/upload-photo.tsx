@@ -86,7 +86,7 @@ export function UpdateSettingForm() {
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg">
-      <div className="mb-4 grid grid-cols-1 md:grid-cols-2 items-start gap-3">
+      {/* <div className="mb-4 grid grid-cols-1 md:grid-cols-2 items-start gap-3">
         <span className="flex flex-col gap-1">
 
           <InputGroup
@@ -120,7 +120,7 @@ export function UpdateSettingForm() {
           {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
 
         </span>
-      </div>
+      </div> */}
       <div className="mb-4 flex flex-col items-start gap-3">
         <label
           htmlFor={"bgImg"}
