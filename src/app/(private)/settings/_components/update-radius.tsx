@@ -70,7 +70,7 @@ export function UpdateRadiusForm() {
                         name="radius"
                         label="Radius:"
                         placeholder="3.175"
-                        defaultValue={radius}
+                        value={radius}
                         handleChange={(e: React.ChangeEvent<HTMLInputElement>) => setRadius(e.target.value)}
                         // icon={<UserIcon />}
                         iconPosition="left"
