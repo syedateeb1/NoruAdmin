@@ -12,9 +12,11 @@ export function UpdateSettingForm() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [loading, setLoading] = useState(true);
 
+  const [backgroundType, setBackgroundType] = useState<"image" | "color">("image");
+  const [bgColor, setBgColor] = useState<string>("#ffffff");
   // Validation errors
+  const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState<{ title?: string; description?: string; photo?: string }>({});
 
   // ✅ Load existing profile on component mount
@@ -25,8 +27,35 @@ export function UpdateSettingForm() {
       if (res?.data) {
         setTitle(res.data.title || "");
         setDescription(res.data.description || "");
-        setPhotoPreview(res.data.image_url || "/users/placeholder.png");
+
+        const value = res.data.value;
+
+        // ✅ Detect if it's an image URL or base64 image
+        const isImage =
+          typeof value === "string" &&
+          (/\.(jpg|jpeg|png|gif|webp)$/i.test(value) || value.startsWith("data:image"));
+
+        // ✅ Detect if it's a valid color code (hex, rgb, rgba)
+        const isColor =
+          typeof value === "string" &&
+          (/^#([0-9A-F]{3}){1,2}$/i.test(value) || /^rgb(a?)\(([^)]+)\)$/.test(value));
+
+        if (isImage) {
+          setBackgroundType("image");
+          setPhotoPreview(value);
+          setBgColor("#ffffff");
+        } else if (isColor) {
+          setBackgroundType("color");
+          setBgColor(value);
+          setPhotoPreview("");
+        } else {
+          // Default fallback
+          setBackgroundType("image");
+          setPhotoPreview("");
+          setBgColor("#ffffff");
+        }
       }
+
     } catch (err) {
       console.error("Error loading profile:", err);
       toast.error("Failed to load profile");
@@ -53,7 +82,9 @@ export function UpdateSettingForm() {
     const newErrors: { title?: string; description?: string; photo?: string } = {};
     if (!title.trim()) newErrors.title = "Title is required";
     if (!description.trim()) newErrors.description = "Description is required";
-    if (!photoFile && !photoPreview) newErrors.photo = "Photo is required";
+
+    if (backgroundType === "image" && !photoFile && !photoPreview)
+      newErrors.photo = "Photo is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -65,7 +96,12 @@ export function UpdateSettingForm() {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
-    if (photoFile) formData.append("image", photoFile);
+    formData.append("addType", backgroundType);
+    if (backgroundType === "color") {
+      formData.append("value", bgColor);
+    } else if (photoFile) {
+      formData.append("value", photoFile);
+    }
 
     try {
       const res = await settings(formData);
@@ -121,7 +157,21 @@ export function UpdateSettingForm() {
 
         </span>
       </div> */}
-      <div className="mb-4 flex flex-col items-start gap-3">
+      <div className="mb-4 flex flex-col gap-2">
+        <label htmlFor="backgroundType" className="font-medium text-gray-700 dark:text-white">
+          Background Type:
+        </label>
+        <select
+          id="backgroundType"
+          value={backgroundType}
+          onChange={(e) => setBackgroundType(e.target.value as "image" | "color")}
+          className="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-primary focus:outline-none dark:bg-dark-2 dark:border-dark-3"
+        >
+          <option value="image">Image</option>
+          <option value="color">Color</option>
+        </select>
+      </div>
+      {backgroundType === "image" ? (<div className="mb-4 flex flex-col items-start gap-3">
         <label
           htmlFor={"bgImg"}
           className="text-body-sm font-medium text-dark dark:text-white"
@@ -131,50 +181,70 @@ export function UpdateSettingForm() {
         {errors.photo && <p className="text-red-500 text-sm">{errors.photo}</p>}
 
       </div>
+      ) : (
+        <div className="flex flex-col gap-3 mb-4">
+          <label htmlFor="bgColor" className="text-body-sm font-medium text-dark dark:text-white">
+            Choose Background Color:
+          </label>
+          <input
+            type="color"
+            id="bgColor"
+            value={bgColor}
+            onChange={(e) => setBgColor(e.target.value)}
+            className="w-24 h-10 cursor-pointer border border-gray-300 rounded-md"
+          />
+          <div
+            className="w-full h-32 rounded-md border mt-2"
+            style={{ backgroundColor: bgColor }}
+          ></div>
+        </div>
+      )}
 
       {/* Upload Section */}
-      <div className="w-full h-full min-h-[400px] border border-dashed border-gray-300 rounded-xl bg-gray-100 hover:border-primary dark:border-dark-3 dark:bg-dark-2 dark:hover:border-primary flex flex-col items-center justify-center transition-all relative overflow-hidden">
-        <input
-          type="file"
-          name="bgImg"
-          id="bgImg"
-          accept="image/png, image/jpg, image/jpeg"
-          hidden
-          onChange={handleFileChange}
-        />
+      {backgroundType === "image" && (
+        <div className="w-full h-full min-h-[400px] border border-dashed border-gray-300 rounded-xl bg-gray-100 hover:border-primary dark:border-dark-3 dark:bg-dark-2 dark:hover:border-primary flex flex-col items-center justify-center transition-all relative overflow-hidden">
+          <input
+            type="file"
+            name="bgImg"
+            id="bgImg"
+            accept="image/png, image/jpg, image/jpeg"
+            hidden
+            onChange={handleFileChange}
+          />
 
-        <label
-          htmlFor="bgImg"
-          className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center text-center p-4"
-        >
-          {photoPreview ? (
-            <div className="relative w-full h-full">
-              <Image
-                src={photoPreview}
-                alt="bgImg"
-                fill
-                className="object-cover transition-transform hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                <p className="text-white font-medium text-sm bg-black/60 px-3 py-1 rounded-lg">
-                  Change Photo
+          <label
+            htmlFor="bgImg"
+            className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center text-center p-4"
+          >
+            {photoPreview ? (
+              <div className="relative w-full h-full">
+                <Image
+                  src={photoPreview}
+                  alt="bgImg"
+                  fill
+                  className="object-cover transition-transform hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <p className="text-white font-medium text-sm bg-black/60 px-3 py-1 rounded-lg">
+                    Change Photo
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center text-center">
+                <div className="flex size-16 items-center justify-center rounded-full border border-stroke bg-white dark:border-dark-3 dark:bg-gray-dark">
+                  <UploadIcon />
+                </div>
+                <p className="mt-2 text-body-sm font-medium">
+                  <span className="text-primary">Click to upload</span> or drag and drop
                 </p>
+                <p className="mt-1 text-body-xs">PNG, JPG, JPEG (max 800x800px)</p>
               </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center text-center">
-              <div className="flex size-16 items-center justify-center rounded-full border border-stroke bg-white dark:border-dark-3 dark:bg-gray-dark">
-                <UploadIcon />
-              </div>
-              <p className="mt-2 text-body-sm font-medium">
-                <span className="text-primary">Click to upload</span> or drag and drop
-              </p>
-              <p className="mt-1 text-body-xs">PNG, JPG, JPEG (max 800x800px)</p>
-            </div>
-          )}
-        </label>
-      </div>
+            )}
+          </label>
+        </div>
 
+      )}
 
       <div className="flex justify-end gap-3 mt-4">
         <button
