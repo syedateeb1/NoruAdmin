@@ -96,7 +96,7 @@ export function UpdateSettingForm() {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
-    formData.append("addType", backgroundType);
+    formData.append("addtype", backgroundType);
     if (backgroundType === "color") {
       formData.append("value", bgColor);
     } else if (photoFile) {
