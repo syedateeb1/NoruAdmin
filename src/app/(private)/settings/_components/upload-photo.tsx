@@ -108,7 +108,7 @@ export function UpdateSettingForm() {
       // const res = { success: true, data: { radius: "0.0", photo: "/users/placeholder.png" } };
       if (res?.status === 200) {
         toast.success(res?.message || "Setting updated successfully!");
-        loadProfile();
+        // loadProfile();
       } else {
         toast.error("Failed to update setting");
       }
