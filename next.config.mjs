@@ -27,14 +27,16 @@ const nextConfig = {
       },
       {
         protocol: "http",
-        hostname: "13.62.107.181",
+        hostname: "getnoru.com",
+        // hostname: "13.62.107.181",
         port: "", // <-- empty
 
         pathname: "/**",
       },
       {
         protocol: "http",
-        hostname: "13.62.107.181",
+        hostname: "getnoru.com",
+        // hostname: "13.62.107.181",
         port: "", // must be empty
         pathname: "/cover-photos/**",
       },
