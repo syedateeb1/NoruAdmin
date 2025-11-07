@@ -136,9 +136,6 @@ export const RidesList = () => {
                 setIsLoadingMore(true);
                 const nextPage = currentPage + 1;
                 const newRides = await loadCustomers(searchQuery, nextPage);
-                // console.log("📦 newRides.length:", newRides.length);
-                // console.log("📄 currentPage:", currentPage, "ITEMS_PER_PAGE:", ITEMS_PER_PAGE);
-                console.log(newRides.length < ITEMS_PER_PAGE)
                 if (newRides.length < ITEMS_PER_PAGE) {
                     setHasMore(false);
                     console.log("🚫 No more data to load.");
