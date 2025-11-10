@@ -2,6 +2,8 @@
 import { useAuth } from '@/context/AuthContext';
 import { useSocket } from '@/context/SocketContext';
 import { Chat, ChatRoom, Message } from '@/types/chat';
+import { getOtherUser, getOtherUserImage, getOtherUserName } from '@/utils/chatHelpers';
+import { useFilteredChats } from '@/utils/useFilteredChats';
 import { Search, X } from 'lucide-react'
 import Image from 'next/image'
 import React, { useCallback, useEffect, useState } from 'react'
@@ -12,152 +14,29 @@ type Props = {
     activeId: string;
     isOpen: boolean;   // 👈 new prop
     onClose: () => void; // 👈 new prop
+    loading?: boolean
 };
 
-const ChatSideBar = ({ chats, onSelect, activeId, isOpen, onClose }: Props) => {
+const ChatSideBar = ({ chats, onSelect, activeId, isOpen, onClose, loading }: Props) => {
     const { socket } = useSocket(); // 👈 use socket
 
     const [search, setSearch] = useState('')
-    const [filteredChats, setFilteredChats] = useState<ChatRoom[]>(chats);
     const { user } = useAuth()
 
-    // Helper function to get the other user (not the current user)
 
-    const getOtherUser = useCallback(
-        (chat: ChatRoom) => {
-
-            // Case 1: members is an array of user objects
-            if (Array.isArray(chat?.members)) {
-                return (
-                    chat.members.find((m: any) => m?._id !== user?._id) ??
-                    chat.members[0]
-                );
-            }
-
-            // Case 2: members is a single string id
-            if (typeof chat?.members === "string") {
-                // If it's just the other user’s id, return a placeholder object
-                return { _id: chat.members };
-            }
-
-            return null;
-        },
-        [user?._id]
-    );
-    // Helper function to get the other user's name
-    const getOtherUserName = useCallback(
-        (chat: ChatRoom) => {
-            const otherUser = getOtherUser(chat);
-
-            // Case 1: otherUser exists and has first_name
-            if (otherUser && "first_name" in otherUser && otherUser.first_name) {
-                return `${otherUser.first_name} ${otherUser.last_name ?? ""}`.trim();
-            }
-
-            // Case 2: fallback to lastMessage.sender_name if available
-            if (chat?.lastMessage?.sender_name) {
-                return chat.lastMessage.sender_name;
-            }
-
-            // Default fallback
-            return "Unknown User";
-        },
-        [getOtherUser]
-    );
+    const filteredChats = useFilteredChats(chats, search, user?._id);
 
 
-    // Helper function to get the other user's profile image
-    const getOtherUserImage = (chat: ChatRoom) => {
-        const otherUser = getOtherUser(chat);
-        if (otherUser && 'profile_image' in otherUser) {
-            return otherUser.profile_image || '/images/default-avatar.png'; // fallback image
-        } else {
-            return '/images/default-avatar.png'; // default image
-        }
-    };
     // ✅ handle click - reset unread count for selected chat
-    const handleChatClick = (chatId: string) => {
-        setFilteredChats(prev =>
-            prev.map(chat =>
-                chat._id === chatId
-                    ? { ...chat, unread_count: 0 } // reset unread count
-                    : chat
-            )
-        );
-        // Let server know this chat is now read (prevents future server increments
-        // for messages you saw right before switching)
-        socket?.emit("read", { chatroom_id: chatId, user_id: user?._id });
-        onSelect(chatId);
-        if (onClose) onClose(); // close sidebar on mobile
+    const handleChatClick = useCallback(
+        (chatId: string) => {
+            socket?.emit("read", { chatroom_id: chatId, user_id: user?._id });
+            onSelect(chatId);
+            onClose();
+        },
+        [socket, user?._id, onSelect, onClose]
+    );
 
-
-    };
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (search === '') {
-                setFilteredChats(chats);
-            } else {
-                const filtered = chats.filter((chat) => {
-                    const otherUserName = getOtherUserName(chat).toLowerCase();
-                    return otherUserName.includes(search.toLowerCase());
-                });
-                setFilteredChats(filtered);
-            }
-        }, 300); // debounce
-
-        return () => clearTimeout(timer);
-    }, [search, chats, user?._id, getOtherUserName]); // Add user._id to dependencies
-
-    useEffect(() => {
-        if (!socket) return;
-        const handleChatUpdate = (updatedChat: any) => {
-            setFilteredChats((prev) =>
-                prev.map((chat) => {
-                    if (chat._id === updatedChat._id) {
-                        // If it's the active chat → force unread_count = 0
-                        if (chat._id === activeId) {
-                            return { ...chat, ...updatedChat, unread_count: 0 };
-                        }
-                        return { ...chat, ...updatedChat };
-                    }
-                    return chat;
-                })
-            );
-        };
-
-        // Return a destructor function that cleans up the event listener
-        return () => {
-            socket?.off("chatUpdate", handleChatUpdate);
-        };
-    }, [socket, activeId]);
-    useEffect(() => {
-        if (!socket || !user?._id) return;
-
-        // Wait for socket to connect
-        socket.on("connect", () => {
-            console.log("Socket connected, joining room...");
-            socket.emit("join-room", user._id); // Emit after connection
-        });
-
-        const handleInitialChats = (incoming: ChatRoom[] | ChatRoom) => {
-            setFilteredChats(prev => {
-                // Normalize: always an array
-                const incomingArray = Array.isArray(incoming) ? incoming : [incoming];
-
-                return prev.map(chat => {
-                    const match = incomingArray.find(c => c._id === chat._id);
-                    return match ? { ...chat, ...match } : chat;
-                });
-            });
-        };
-
-        socket.on("chats", handleInitialChats); // Adjust event name based on server
-
-        return () => {
-            socket.off("chats", handleInitialChats);
-            socket.off("connect"); // Clean up connect listener
-        };
-    }, [socket, user?._id]);
 
     return (
         <div
@@ -169,7 +48,7 @@ const ChatSideBar = ({ chats, onSelect, activeId, isOpen, onClose }: Props) => {
                 <div className='flex items-center justify-between py-4 px-2 '>
 
                     <h3 className='text-xl font-bold text-black mt-2'>Chats</h3>
-                    <X className='cursor-pointer mt-2' onClick={onClose} />
+                    {/* <X className='cursor-pointer mt-2' onClick={onClose} /> */}
                 </div>
                 <div className='relative bg-pink-50 rounded-xl h-12 items-center'>
                     <input type="text" placeholder='Search users...'
@@ -185,10 +64,13 @@ const ChatSideBar = ({ chats, onSelect, activeId, isOpen, onClose }: Props) => {
                 {filteredChats.length === 0 && (
                     <p className="text-sm text-gray-500 px-4 py-2">No chats found.</p>
                 )}
-                {filteredChats.map((chat) => {
-                    const otherUser = getOtherUser(chat);
+                {loading ? [...Array(5)].map((_, i) => (
+                    <div key={i} className="px-4 py-3 mx-2 mb-2 h-16 flex bg-gray-50/50 flex-col gap-2">
+                        <span className='px-2 py-1 animate-pulse bg-gray-100 rounded w-1/2'></span>
+                        <span className='px-2 py-1 animate-pulse bg-gray-100 rounded w-1/3'></span>
+                    </div>
+                )) : filteredChats.map((chat) => {
                     const otherUserName = getOtherUserName(chat);
-                    const otherUserImage = getOtherUserImage(chat);
 
                     return (
                         <div

@@ -54,6 +54,12 @@ export const NAV_DATA = [
         icon: Settings, // ✅ Lucide-react icon
         items: [],
       },
+      {
+        title: "Group Settings",
+        url: "/groups",
+        icon: Icons.BaselineChatBubbleOutline, // ✅ Lucide-react icon
+        items: [],
+      },
 
       // {
       //   title: "Calendar",

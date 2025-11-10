@@ -2,7 +2,7 @@
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ChatSideBar from "./_components/chat/ChatSideBar";
 import { ChatContainer } from "./_components/chat/ChatContainer";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChatRoom } from "@/types/chat";
 import { getChatRooms } from "@/services/chatService";
 import { Menu } from "lucide-react";
@@ -14,8 +14,28 @@ export default function Home() {
   const [selectedChat, setSelectedChat] = useState<ChatRoom | null>(null);
   const [allChats, setAllChats] = useState<ChatRoom[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true); // 👈 sidebar toggle state
+  const [loading, setLoading] = useState(true);
 
-  const handleMarkAsRead = (chatId: string) => {
+
+  // ✅ Fetch chats (memoized to prevent unnecessary re-creation)
+  const fetchChats = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await getChatRooms("is_support=true");
+      setAllChats(response || []);
+    } catch (error) {
+      console.error("❌ Failed to fetch chat rooms:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // ✅ Initial fetch on mount
+  useEffect(() => {
+    fetchChats();
+  }, [fetchChats]);
+
+  const handleMarkAsRead = useCallback((chatId: string) => {
 
     setAllChats((prev) =>
       prev.map((c) =>
@@ -23,36 +43,25 @@ export default function Home() {
       )
     );
 
-  };
-  useEffect(() => {
-    console.log("✅ allChats updated:", allChats);
-  }, [allChats]);
-  const handleSelectChat = (id: string) => {
-    const chat = allChats.find((c) => c._id === id);
-
-    if (chat) setSelectedChat(chat);
-  };
-  useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        const res = await getChatRooms('is_support=true'); // 👈 call your service
-
-        // Access the data array from the response 
-
-        setAllChats(res); // update state with the array
-        // if (chatRooms.length > 0) setSelectedChat(chatRooms[0]); // default to first chat
-      } catch (err) {
-        console.error("Failed to fetch chat rooms", err);
-      }
-    };
-    fetchChats();
   }, []);
+
+  const handleSelectChat = useCallback((id: string) => {
+    // console.log({ id })
+    const chat = allChats.find((c) => c._id === id);
+    // console.log({ chat })
+    if (chat) setSelectedChat(chat);
+  },
+    [allChats]
+  );
 
 
   const setSideBar = (status: boolean) => {
-    setIsSidebarOpen(status)
+    // setIsSidebarOpen(status)
     console.log("🚀 ~ file: page.tsx:68 ~ setSideBar ~ isSidebarOpen:", isSidebarOpen)
   }
+
+  const chatList = useMemo(() => allChats, [allChats]);
+
   return (
     <>
       <ProtectedRoute>
@@ -64,6 +73,7 @@ export default function Home() {
             activeId={selectedChat?._id ?? ""}
             isOpen={isSidebarOpen}
             onClose={() => setSideBar(false)}
+            loading={loading}
           />
 
           {/* Mobile top bar */}
@@ -81,9 +91,17 @@ export default function Home() {
 
           {/* Chat container */}
           <div className="flex-1">
-            {selectedChat && (
-              <ChatContainer {...selectedChat} onReadChat={handleMarkAsRead} />
+            {selectedChat ? (
+              <ChatContainer
+                {...selectedChat}
+                onReadChat={handleMarkAsRead}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                {loading ? "Loading chats..." : "Select a chat to start messaging"}
+              </div>
             )}
+
           </div>
         </div>
       </ProtectedRoute>

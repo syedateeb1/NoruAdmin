@@ -19,6 +19,21 @@ export async function getChatRooms(query = ""): Promise<ChatRoom[]> {
     throw new Error("An unexpected error occurred");
   }
 }
+export async function getGroups(query = ""): Promise<any[]> {
+  try {
+    const response = await axiosClient.get<ChatRoomsResponse>(
+      chatUrl + "?" + query,
+    );
+    return response.data.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Axios error fetching rides:", error.response?.data);
+      throw new Error(error.response?.data?.message || "Failed to fetch rides");
+    }
+    console.error("Unexpected error:", error);
+    throw new Error("An unexpected error occurred");
+  }
+}
 export async function getMessages(query = ""): Promise<ChatRoom[]> {
   try {
     const response = await axiosClient.get<ChatRoomsResponse>(

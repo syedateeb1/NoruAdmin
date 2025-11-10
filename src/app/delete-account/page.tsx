@@ -1,4 +1,5 @@
 "use client";
+import DeleteWithPassword from "@/components/Auth/DeleteAccountVerify";
 import Signin from "@/components/Auth/Signin";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { useAuth } from "@/context/AuthContext";
@@ -49,11 +50,11 @@ export default function SignIn() {
         {/* Right side with form */}
         <div className="w-full md:w-1/2 flex items-center justify-center bg-gray-50">
           <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-3xl">
-            <h2 className="text-2xl font-bold text-center mb-2 text-black">Welcome Back</h2>
+            <h2 className="text-2xl font-bold text-center mb-2 text-black">Delete Your Account</h2>
             <p className="text-sm text-black text-center mb-6">
-              Login to continue to the dashboard
+              Verify your identity to delete your account
             </p>
-            <Signin />
+            <DeleteWithPassword />
           </div>
         </div>
       </div>

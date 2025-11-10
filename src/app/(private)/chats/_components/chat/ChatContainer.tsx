@@ -190,7 +190,7 @@ export const ChatContainer = (
             socket.off("messages", handleNewMessage);
             socket.emit("leave-room", chat._id); // optional
         };
-    }, [socket, chat, user?._id]);
+    }, [socket, chat._id, user?._id]);
 
 
     // OPTIONAL: whenever the last message in this chat changes (e.g., page fetch),

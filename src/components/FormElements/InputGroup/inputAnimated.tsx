@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { type HTMLInputTypeAttribute, useEffect, useId, useRef, useState } from "react";
-import { Eye, EyeOff } from "lucide-react"; // 👈 Replace with your icon set if needed
+import { Eye, EyeOff } from "lucide-react";
 
 type InputGroupProps = {
     label: string;
@@ -14,7 +14,7 @@ type InputGroupProps = {
     type?: HTMLInputTypeAttribute;
     error?: string;
     required?: boolean;
-    className?: string; // ✅ now accepted
+    className?: string;
 };
 
 const InputGroupAnimated: React.FC<InputGroupProps> = ({
@@ -32,16 +32,11 @@ const InputGroupAnimated: React.FC<InputGroupProps> = ({
     const id = useId();
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const [isFloating, setIsFloating] = useState(
-        !!(value && value.length > 0)
-    );
+    const [isFloating, setIsFloating] = useState(!!(value && value.length > 0));
 
     useEffect(() => {
-
-        setIsFloating(true);
-
-    }, []);
-
+        if (value && value.length > 0) setIsFloating(true);
+    }, [value]);
 
     const isPassword = type === "password";
     const [showPassword, setShowPassword] = useState(false);
@@ -61,7 +56,6 @@ const InputGroupAnimated: React.FC<InputGroupProps> = ({
                     setIsFloating(e.target.value.length > 0);
                 }}
                 autoComplete={autoComplete}
-
                 placeholder=" "
                 className={cn(
                     "peer w-full rounded-md border border-gray-300 pl-14 pr-11 pt-[18px] pb-[6px] text-sm text-gray-900 bg-transparent placeholder-transparent",
@@ -75,9 +69,9 @@ const InputGroupAnimated: React.FC<InputGroupProps> = ({
             <label
                 htmlFor={id}
                 className={cn(
-                    "pointer-events-none absolute bg-white p-1 left-14 top-[14px] text-sm text-gray-500 transition-all duration-200",
-                    "peer-placeholder-shown:top-[8px] peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400",
-                    "peer-focus:top-[-6px]  peer-focus:text-xs peer-focus:text-[#7b61ff]",
+                    "pointer-events-none absolute bg-white p-1 left-14 text-sm text-gray-500 transition-all duration-200",
+                    "peer-placeholder-shown:top-[10px] peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400",
+                    "peer-focus:top-[-6px] peer-focus:text-xs peer-focus:text-[#7b61ff]",
                     isFloating && "top-[-6px] text-xs text-[#7b61ff]"
                 )}
             >
@@ -85,24 +79,27 @@ const InputGroupAnimated: React.FC<InputGroupProps> = ({
                 {required && <span className="ml-0.5 text-red-500">*</span>}
             </label>
 
-            {/* Left Icon Inside Input */}
+            {/* Left Icon */}
             {icon && (
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                <div className="absolute left-4 top-1/3 -translate-y-1/2 text-gray-400 pointer-events-none">
                     {icon}
                 </div>
             )}
-            {/* Password Toggle Icon on Right */}
+
+            {/* Password Toggle */}
             {isPassword && (
                 <div
-                    className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-white"
+                    className="absolute right-4  top-1/3 -translate-y-1/2 cursor-pointer text-gray-400"
                     onClick={() => setShowPassword((prev) => !prev)}
                 >
-                    {showPassword ? <EyeOff size={18} className="text-gray-400" /> : <Eye size={18} className="text-gray-400" />}
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </div>
             )}
 
-            {/* Optional Error Message */}
-            {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+            {/* Error Message Space */}
+            <div className="min-h-[1.25rem]">
+                {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+            </div>
         </div>
     );
 };
