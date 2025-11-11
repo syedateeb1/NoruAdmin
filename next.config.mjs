@@ -20,14 +20,15 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "http",
-        hostname: "51.21.132.147",
+        protocol: "https",
+        hostname: "getnoru.com",
         port: "",
         pathname: "/**",
       },
       {
-        protocol: "http",
+        protocol: "https",
         hostname: "getnoru.com",
+        // hostname: "13.62.107.181",
         // hostname: "13.62.107.181",
         port: "", // <-- empty
 
