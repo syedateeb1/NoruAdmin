@@ -15,8 +15,8 @@ export async function CreateUser(data: FormData) {
   return response.data;
 }
 
-export async function GetUser() {
-  const response = await axiosClient.get("/users");
+export async function GetUser(page = 1, limit = 20) {
+  const response = await axiosClient.get(`/users?page=${page}&limit=${limit}`);
   return response.data;
 }
 

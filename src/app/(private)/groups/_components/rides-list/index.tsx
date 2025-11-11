@@ -5,7 +5,7 @@ import Image from "next/image";
 import { getGroups } from "@/services/chatService";
 import { scrollDiv } from "@/utils/constants";
 import { Loader2, User, Pencil } from "lucide-react";
-import { GroupEditModal } from "../modal/GroupEditModal";
+import { GroupEditModal, resolveImageUrl } from "../modal/GroupEditModal";
 // import { GroupEditModal } from "../modal/GroupEditModal";
 
 export const GroupsList = () => {
@@ -54,7 +54,8 @@ export const GroupsList = () => {
                 <div className="flex items-center space-x-4">
                     {group.group_image ? (
                         <Image
-                            src={group.group_image}
+                            src={resolveImageUrl(group.group_image)}
+
                             alt={group.name}
                             width={64}
                             height={64}
@@ -87,7 +88,8 @@ export const GroupsList = () => {
                             >
                                 {member.profile_image ? (
                                     <Image
-                                        src={`/${member.profile_image}`}
+                                        // src={`/${member.profile_image}`}
+                                        src={resolveImageUrl(member.profile_image)}
                                         alt={member.first_name}
                                         width={40}
                                         height={40}

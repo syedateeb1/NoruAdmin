@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Edit, X } from "lucide-react";
 import { GetUser } from "@/services/userService";
@@ -21,20 +21,59 @@ export const GroupEditModal = ({ group, onClose, onUpdated }: any) => {
     const [allUsers, setAllUsers] = useState<any[]>([]);
     const [saving, setSaving] = useState(false);
     const [imageFile, setImageFile] = useState<File | null>(null);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const listRef = useRef<HTMLDivElement>(null);
+    const [loadingUsers, setLoadingUsers] = useState(false);
 
     // ✅ Fetch all users for selection list
-    const fetchUsers = async () => {
+    const fetchUsers = async (pageNumber = 1) => {
         try {
-            const users = await GetUser();
-            setAllUsers(users.data);
+            setLoadingUsers(true);
+            const res = await GetUser(pageNumber, 20);
+            const newUsers = res.data;
+
+            if (pageNumber === 1) {
+                setAllUsers(newUsers);
+            } else {
+                setAllUsers((prev) => [...prev, ...newUsers]);
+            }
+
+            if (newUsers.length === 0 || newUsers.length < 20) {
+                setHasMore(false);
+            }
         } catch (err) {
             toast.error("Failed to load users");
+        } finally {
+            setLoadingUsers(false);
         }
     };
 
     useEffect(() => {
-        fetchUsers();
+        fetchUsers(1);
     }, []);
+
+    // ✅ Scroll pagination
+    useEffect(() => {
+        const div = listRef.current;
+        if (!div) return;
+
+        const handleScroll = () => {
+            if (!hasMore || loadingUsers) return;
+            const bottom = div.scrollHeight - div.scrollTop <= div.clientHeight + 20;
+            if (bottom) {
+                setPage((prev) => prev + 1);
+            }
+        };
+
+        div.addEventListener("scroll", handleScroll);
+        return () => div.removeEventListener("scroll", handleScroll);
+    }, [hasMore, loadingUsers]);
+
+    // ✅ Fetch more users when page changes
+    useEffect(() => {
+        if (page > 1) fetchUsers(page);
+    }, [page]);
 
     // ✅ Toggle member selection
     const handleSelect = (user: any) => {
@@ -129,20 +168,25 @@ export const GroupEditModal = ({ group, onClose, onUpdated }: any) => {
                 </div>
 
                 {/* Group Image */}
-                <div className="mb-3">
+                <div className="mb-6">
                     <label className="text-sm text-gray-600">Group Image</label>
-                    <div className="relative w-[60px] h-[60px] mt-2">
+                    <div className="relative w-[60px] h-[60px] my-2 ">
                         {image ? (
                             <Image
-                                src={image}
+                                src={resolveImageUrl(image)}
                                 alt="group"
                                 width={60}
                                 height={60}
                                 className="rounded-full object-cover"
+                                onError={(e) => {
+                                    // Optional fallback if the image fails to load
+                                    (e.target as HTMLImageElement).src = "/default-group.png";
+                                }}
                             />
                         ) : (
                             <div className="w-[60px] h-[60px] bg-gray-200 rounded-full" />
                         )}
+
 
                         {/* Pencil icon overlay */}
                         <label className="absolute bottom-0 right-0 bg-white p-1 rounded-full border cursor-pointer hover:bg-gray-100">
@@ -164,26 +208,42 @@ export const GroupEditModal = ({ group, onClose, onUpdated }: any) => {
                 </div>
 
                 {/* Members Selection */}
-                <div className="mb-4 max-h-[200px] overflow-y-auto border rounded-md p-2">
+                <div
+                    ref={listRef}
+                    className="mb-4 max-h-[200px] overflow-y-auto border rounded-md p-2"
+                >
                     <p className="text-sm text-gray-600 mb-2">Select Members</p>
-                    {allUsers.filter((u) => u.user_type === "Driver" || u.user_type === "Agency").map((user) => {
-                        const isSelected = members.some((m) => m._id === user._id);
-                        return (
-                            <label
-                                key={user._id}
-                                className="flex items-center space-x-2 py-1 cursor-pointer"
-                            >
-                                <input
-                                    type="checkbox"
-                                    checked={isSelected}
-                                    onChange={() => handleSelect(user)}
-                                />
-                                <span className="text-sm">
-                                    {user.first_name} {user.last_name}
-                                </span>
-                            </label>
-                        );
-                    })}
+                    {allUsers
+                        .filter((u) => u.user_type === "Driver" || u.user_type === "Agency")
+                        .map((user) => {
+                            const isSelected = members.some((m) => m._id === user._id);
+                            return (
+                                <label
+                                    key={user._id}
+                                    className="flex items-center space-x-2 py-1 cursor-pointer"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        onChange={() => handleSelect(user)}
+                                    />
+                                    <span className="text-sm">
+                                        {user.first_name} {user.last_name}
+                                    </span>
+                                </label>
+                            );
+                        })}
+
+                    {loadingUsers && (
+                        <p className="text-center text-sm text-gray-500 py-2">
+                            Loading more users...
+                        </p>
+                    )}
+                    {!hasMore && (
+                        <p className="text-center text-sm text-gray-400 py-2">
+                            No more users
+                        </p>
+                    )}
                 </div>
 
                 <button
@@ -196,4 +256,22 @@ export const GroupEditModal = ({ group, onClose, onUpdated }: any) => {
             </div>
         </div>
     );
+};
+
+export const resolveImageUrl = (src?: string) => {
+    if (!src) return "";
+
+    // ✅ Handle blob URLs for local preview
+    if (src.startsWith("blob:")) return src;
+
+    // ✅ Already absolute URL
+    if (src.startsWith("http")) return src;
+
+    // ✅ Handle relative paths that are missing the leading slash
+    if (!src.startsWith("/")) {
+        src = "/" + src;
+    }
+
+    // ✅ Combine with backend domain
+    return `https://getnoru.com${src}`;
 };
