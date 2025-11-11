@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { X } from "lucide-react";
+import { Edit, X } from "lucide-react";
 import { GetUser } from "@/services/userService";
 import { addUserToGroup, removeUserFromGroup, updateGroupInfo } from "@/services/groupService";
 import toast from "react-hot-toast";
@@ -52,13 +52,15 @@ export const GroupEditModal = ({ group, onClose, onUpdated }: any) => {
         try {
             // 1️⃣ Update group name/image
             if (name !== group.name || imageFile) {
-                const payload = {
-                    name,
-                    group_image: imageFile ? URL.createObjectURL(imageFile) : image,
-                }
-                // if (imageFile) formData.append("image", imageFile);
+                const formData = new FormData();
+                formData.append("name", name);
 
-                await updateGroupInfo(group._id, payload);
+                // Only append the image file if it exists
+                if (imageFile) {
+                    formData.append("group_image", imageFile);
+                }
+
+                await updateGroupInfo(group._id, formData); // Make sure your API supports multipart/form-data
                 toast.success("Group info updated successfully!");
 
             }
@@ -129,30 +131,35 @@ export const GroupEditModal = ({ group, onClose, onUpdated }: any) => {
                 {/* Group Image */}
                 <div className="mb-3">
                     <label className="text-sm text-gray-600">Group Image</label>
-                    <div className="flex items-center space-x-3 mt-2">
+                    <div className="relative w-[60px] h-[60px] mt-2">
                         {image ? (
                             <Image
                                 src={image}
                                 alt="group"
-                                width={50}
-                                height={50}
+                                width={60}
+                                height={60}
                                 className="rounded-full object-cover"
                             />
-                            // <></>
                         ) : (
-                            <div className="w-[50px] h-[50px] bg-gray-200 rounded-full" />
+                            <div className="w-[60px] h-[60px] bg-gray-200 rounded-full" />
                         )}
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                    setImage(URL.createObjectURL(file));
-                                    setImageFile(file);
-                                }
-                            }}
-                        />
+
+                        {/* Pencil icon overlay */}
+                        <label className="absolute bottom-0 right-0 bg-white p-1 rounded-full border cursor-pointer hover:bg-gray-100">
+                            <Edit size={12} />
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        setImage(URL.createObjectURL(file));
+                                        setImageFile(file);
+                                    }
+                                }}
+                            />
+                        </label>
                     </div>
                 </div>
 

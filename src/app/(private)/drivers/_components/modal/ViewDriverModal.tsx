@@ -8,7 +8,8 @@ import React from "react";
 
 interface ViewDriverModalProps {
     isOpen: boolean;
-    onClose: () => void;
+    onClose: () => void; driverCompleteData?: any;
+
     driver?: any; // ideally, type this better if you have types
     onClickHandle?: (name: string, id: string, status?: string) => Promise<any>;
 }
@@ -16,12 +17,12 @@ const pCss = "flex items-center gap-2"
 export const ViewDriverModal: React.FC<ViewDriverModalProps> = ({
     isOpen,
     onClose,
-    driver,
+    driver, driverCompleteData,
     onClickHandle
 }) => {
     if (!isOpen || !driver) return null;
-    console.log({ driver })
     const publicUrl = process.env.NEXT_PUBLIC_API_PUBLIC_URL || "";
+    const driverDetailFull = driverCompleteData.find((item: any) => item._id === driver?._id)
 
     const getFullUrl = (url?: string) => {
         if (!url) return "";
@@ -33,7 +34,7 @@ export const ViewDriverModal: React.FC<ViewDriverModalProps> = ({
             driver.approved = resp.approved
         }
     };
-
+    console.log({ driverDetailFull })
     return (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex justify-center items-center overflow-auto px-4">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6">
@@ -74,6 +75,20 @@ export const ViewDriverModal: React.FC<ViewDriverModalProps> = ({
                             <p><strong>Rides:</strong> {driver?.rides ?? 0}</p>
                             <p><strong>Rating:</strong> {driver?.rating ?? "N/A"}</p>
                             <p><strong>Income:</strong> ${driver?.income ?? 0}</p>
+                            <p className="flex items-center gap-2 col-span-2">
+                                <strong className="w-[50%]">Subscription Status:</strong>
+                                <span
+                                    className={`flex items-center justify-center font-semibold capitalize ${driverDetailFull?.subscription_status &&
+                                        driverDetailFull.subscription_status !== "cancelled" &&
+                                        driverDetailFull.subscription_status !== "none"
+                                        ? "text-green-700"
+                                        : "text-red-700"
+                                        }`}
+                                >
+                                    {driverDetailFull?.subscription_status ?? "none"}
+                                </span>
+                            </p>
+
                         </div>
                     </div>
 
@@ -171,7 +186,7 @@ export const ViewDriverModal: React.FC<ViewDriverModalProps> = ({
                                     height={112}  // h-28 = 7rem
                                     className="object-cover rounded-lg shadow border"
                                 />
-                            ))} 
+                            ))}
                         </div>
                     </div>
                 )}

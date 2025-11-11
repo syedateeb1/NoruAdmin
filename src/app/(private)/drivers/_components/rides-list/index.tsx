@@ -61,6 +61,8 @@ export const DriversList = () => {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [selectedDriver, setSelectedDriver] = useState<any>(null);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [driverCompleteData, setDriverCompleteData] = useState([])
+
     const loadCustomers = useCallback(
         async (query: string, page = 1) => {
             console.log(`🔍 Fetching customers for query "${query}", page ${page}`);
@@ -74,6 +76,7 @@ export const DriversList = () => {
                         : [];
 
                 const transformedData = transformRideData({ data: result });
+                setDriverCompleteData(result)
 
                 // ✅ New logic here
                 if (page === 1 && transformedData.length < ITEMS_PER_PAGE) {
@@ -272,6 +275,7 @@ export const DriversList = () => {
                     isOpen={isViewModalOpen}
                     onClose={() => setIsViewModalOpen(false)}
                     driver={selectedDriver}
+                    driverCompleteData={driverCompleteData}
                     onClickHandle={onClickHandle}
                 />
             )}

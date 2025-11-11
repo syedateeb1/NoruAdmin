@@ -59,15 +59,12 @@ export const removeUserFromGroup = async (id: string, data: string[]) => {
   }
 };
 
-export const updateGroupInfo = async (
-  id: string,
-  payload: { name: string; group_image: string },
-) => {
+export const updateGroupInfo = async (id: string, payload: FormData) => {
   try {
     const response = await axiosClient.patch(`/chatrooms/${id}`, payload, {
-      //   headers: {
-      //     "Content-Type": "multipart/form-data", // ✅ override JSON header
-      //   },
+      headers: {
+        "Content-Type": "multipart/form-data", // ✅ override JSON header
+      },
     });
     return response.data;
   } catch (error) {

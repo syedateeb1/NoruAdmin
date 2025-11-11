@@ -156,7 +156,19 @@ export const ViewTravellerModal: React.FC<ViewDriverModalProps> = ({
                             <p><strong>Email:</strong> {driver?.email ?? "N/A"}</p>
                             <p><strong>Rating:</strong> {driver?.rating ?? "N/A"}</p>
                             <p><strong>Income:</strong> ${driver?.income ?? 0}</p>
-                            {driverDetailFull?.subscription_status && (<p className="flex items-center gap-2 col-span-2"><strong className="w-[50%]">Subscription Status:</strong> <span className={`flex items-center justify-center   font-semibold ${driverDetailFull?.subscription_status !== "cancelled" ? "  text-green-700" : "  text-red-700"}`}>{driverDetailFull?.subscription_status === "cancelled" ? "Cancelled" : "Active"}</span></p>)}
+                            <p className="flex items-center gap-2 col-span-2">
+                                <strong className="w-[50%]">Subscription Status:</strong>
+                                <span
+                                    className={`flex items-center justify-center font-semibold capitalize ${driverDetailFull?.subscription_status &&
+                                            driverDetailFull.subscription_status !== "cancelled" &&
+                                            driverDetailFull.subscription_status !== "none"
+                                            ? "text-green-700"
+                                            : "text-red-700"
+                                        }`}
+                                >
+                                    {driverDetailFull?.subscription_status ?? "none"}
+                                </span>
+                            </p>
 
                         </div>
 
