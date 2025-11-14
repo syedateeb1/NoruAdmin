@@ -1,5 +1,9 @@
 // src/services/authService.ts
-import { chatUrl, messagesUrl } from "@/data/constants/apiRoutes";
+import {
+  chatUrl,
+  deleteMessageUrl,
+  messagesUrl,
+} from "@/data/constants/apiRoutes";
 import axiosClient from "@/lib/axiosClient";
 import { ChatRoom, ChatRoomsResponse } from "@/types/chat";
 import axios from "axios";
@@ -47,6 +51,26 @@ export async function getMessages(query = ""): Promise<ChatRoom[]> {
     }
     console.error("Unexpected error:", error);
     throw new Error("An unexpected error occurred");
+  }
+}
+export async function deleteChat(query: string): Promise<{
+  message: string;
+  status: string | number;
+  data: any;
+}> {
+  try {
+    const response = await axiosClient.delete(deleteMessageUrl + "?" + query);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data || "Failed to fetch rides";
+    }
+    console.error("Unexpected error:", error);
+    return {
+      message: "An unexpected error occurred",
+      status: "error",
+      data: null,
+    };
   }
 }
 export async function sendMessage(formData: FormData) {

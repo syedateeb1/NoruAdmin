@@ -17,11 +17,11 @@ export default function SignIn() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!loading && user) {
-      router.replace("/"); // Redirect to private home page if logged in
-    }
-  }, [loading, user, router]);
+  // useEffect(() => {
+  //   if (!loading && user) {
+  //     router.replace("/"); // Redirect to private home page if logged in
+  //   }
+  // }, [loading, user, router]);
 
   if (loading) return <p>Loading...</p>;
   return (

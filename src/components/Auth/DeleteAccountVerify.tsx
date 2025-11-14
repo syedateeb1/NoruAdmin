@@ -5,7 +5,7 @@ import React, { useCallback, useState } from "react";
 import InputGroupAnimated from "../FormElements/InputGroup/inputAnimated";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { loginUser } from "@/services/authService";
+import { deleteUser, loginUser } from "@/services/authService";
 import Swal from "sweetalert2";
 
 interface FormData {
@@ -87,10 +87,9 @@ const DeleteWithPassword: React.FC = () => {
         setErrors((prev) => ({ ...prev, general: undefined }));
 
         try {
-            const result = await loginUser({
+            const result = await deleteUser({
                 email: formData.email,
-                password: formData.password,
-                user_type: "Customer"
+                password: formData.password
             });
 
             login({ user: result.data, token: result.data.token });
@@ -139,7 +138,7 @@ const DeleteWithPassword: React.FC = () => {
                     disabled={loading}
                     className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary p-4 font-medium text-white transition hover:bg-opacity-90 disabled:opacity-60"
                 >
-                    {loading ? "Signing in..." : "Sign In"}
+                    {loading ? "Deleting..." : "Delete"}
                     {loading && (
                         <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-white border-t-transparent dark:border-primary dark:border-t-transparent" />
                     )}

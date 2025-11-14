@@ -23,15 +23,20 @@ const OptimizedImage = ({
     const [imgSrc, setImgSrc] = useState(src || fallback);
 
     return (
-        <Image
-            src={imgSrc || fallback}
-            alt={alt}
-            width={width}
-            height={height}
-            className={`object-cover rounded-full border shadow-md ${className}`}
-            onError={() => setImgSrc(fallback)}
-            unoptimized
-        />
+        <div
+            className={`rounded-full overflow-hidden flex justify-center items-center ${className}`}
+            style={{ width, height }}
+        >
+            <Image
+                src={imgSrc || fallback}
+                alt={alt}
+                width={width}
+                height={height}
+                className="object-cover"
+                onError={() => setImgSrc(fallback)}
+                unoptimized
+            />
+        </div>
     );
 };
 

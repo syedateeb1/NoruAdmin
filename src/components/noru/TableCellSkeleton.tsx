@@ -49,12 +49,12 @@ export const TableCellSkeleton = ({ image, name, heading }: { image?: string, na
     return (
         <div className="flex gap-2 items-center overflow-hidden max-w-full  px-[2px]">
             {image && (
+
                 <OptimizedImage
                     src={image}
                     alt="Avatar"
                     width={40}
                     height={40}
-                    className="w-10 h-10 rounded-full object-cover"
                 />
             )}
 

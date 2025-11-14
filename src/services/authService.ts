@@ -1,5 +1,9 @@
 // src/services/authService.ts
-import { loginUrl, overviewDashboardUrl } from "@/data/constants/apiRoutes";
+import {
+  delUrl,
+  loginUrl,
+  overviewDashboardUrl,
+} from "@/data/constants/apiRoutes";
 import axiosClient from "@/lib/axiosClient";
 
 export interface LoginData {
@@ -10,6 +14,10 @@ export interface LoginData {
 
 export async function loginUser(data: LoginData) {
   const response = await axiosClient.post(loginUrl, data); // Adjust URL as per your backend
+  return response.data; // { token, ...etc }
+}
+export async function deleteUser(data: LoginData) {
+  const response = await axiosClient.post(delUrl, data); // Adjust URL as per your backend
   return response.data; // { token, ...etc }
 }
 

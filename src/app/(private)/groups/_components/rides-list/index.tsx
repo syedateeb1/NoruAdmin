@@ -6,6 +6,7 @@ import { getGroups } from "@/services/chatService";
 import { scrollDiv } from "@/utils/constants";
 import { Loader2, User, Pencil } from "lucide-react";
 import { GroupEditModal, resolveImageUrl } from "../modal/GroupEditModal";
+import { AdminChatContainer } from "../AdminChat";
 // import { GroupEditModal } from "../modal/GroupEditModal";
 
 export const GroupsList = () => {
@@ -53,14 +54,17 @@ export const GroupsList = () => {
 
                 <div className="flex items-center space-x-4">
                     {group.group_image ? (
-                        <Image
-                            src={resolveImageUrl(group.group_image)}
+                        <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
 
-                            alt={group.name}
-                            width={64}
-                            height={64}
-                            className="rounded-full object-cover"
-                        />
+                            <Image
+                                src={resolveImageUrl(group.group_image)}
+
+                                alt={group.name}
+                                width={64}
+                                height={64}
+                                className="w-full h-full object-cover rounded-full"
+                            />
+                        </div>
                         // <></>
                     ) : (
                         <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
@@ -78,8 +82,9 @@ export const GroupsList = () => {
 
             {/* Members List */}
             <div>
-                <h3 className="text-base font-semibold text-gray-700 mb-2">Members</h3>
-                <div className={`${scrollDiv} bg-white rounded-2xl p-3 shadow`}>
+                <h3 className="text-base font-semibold text-gray-700 mb-2">Chats</h3>
+                <AdminChatContainer id={group._id} />
+                {/* <div className={`${scrollDiv} bg-white rounded-2xl p-3 shadow`}>
                     {group.members?.length ? (
                         group.members.map((member: any) => (
                             <div
@@ -117,7 +122,7 @@ export const GroupsList = () => {
                     ) : (
                         <p className="text-gray-500 text-sm text-center">No members found.</p>
                     )}
-                </div>
+                </div> */}
             </div>
 
             {/* Edit Modal */}
